@@ -161,20 +161,20 @@ function receivedMessage(event) {
                 sendBurgerMenu(senderID);
                 break;
 
-                case 'big macs':
-                case 'big mac':
-                    sendBigMac(senderID);
-                    break top;
+            case 'big macs':
+            case 'big mac':
+                sendBigMac(senderID);
+                break top;
 
-                case 'big macs':
-                case 'big mac':
-                    sendBigMac(senderID);
-                    break top;
+            case 'big macs':
+            case 'big mac':
+                sendBigMac(senderID);
+                break top;
 
-                case "i want some drink":
-                    sendTextMessage(senderID, "This is our drink menu. Please click on the option that you want.");
-                    sendDrinkMenu(senderID);
-                    break top;
+            case "i want some drink":
+                sendTextMessage(senderID, "This is our drink menu. Please click on the option that you want.");
+                sendDrinkMenu(senderID);
+                break top;
 
             default:
                 var messageList = messageText.split(/[\s,]+/);
@@ -210,22 +210,26 @@ function receivedMessage(event) {
                             sendTextMessage(senderID, "Do you mean our website? If yes, this is it https://www.mcdonalds.com/us/en-us.html");
                             break top;
 
-                            case 'bigmac':
-                            case 'big mac':
-                            case 'bigmacs':
-                            case 'big macs':
-                                sendBigMac(senderID);
-                                break top;
+                        case 'bigmac':
+                        case 'big mac':
+                        case 'bigmacs':
+                        case 'big macs':
+                            sendBigMac(senderID);
+                            break top;
 
-                            case 'bigmac':
-                            case 'big mac':
-                            case 'bigmacs':
-                            case 'big macs':
-                                sendBigMac(senderID);
-                                break top;
+                        case 'bigmac':
+                        case 'big mac':
+                        case 'bigmacs':
+                        case 'big macs':
+                            sendBigMac(senderID);
+                            break top;
 
-                            case 'website':
-                                sendTextMessage(senderID, "Do you mean our website? If yes, this is it https://www.mcdonalds.com/us/en-us.html");
+                        case 'website':
+                            sendTextMessage(senderID, "Do you mean our website? If yes, this is it https://www.mcdonalds.com/us/en-us.html");
+                            break top;
+                        default:
+                            if (i == (messageList.length - 1)) {
+                                sendTextMessage(senderID, "I don't quite catch that. Please try again");
                                 break top;
                             }
                             else continue;
@@ -765,7 +769,6 @@ function callSendAPI(messageData) {
         }
     });
 }
-
 
 app.listen(app.get('port'), function () {
     console.log('Node app is running on port', app.get('port'));
