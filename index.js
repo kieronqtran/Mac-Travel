@@ -244,9 +244,9 @@ function receivedMessage(event) {
 /*
  * Postback Event
  *
- * This event is called when a postback is tapped on a Structured Message. 
+ * This event is called when a postback is tapped on a Structured Message.
  * https://developers.facebook.com/docs/messenger-platform/webhook-reference/postback-received
- * 
+ *
  */
 function receivedPostback(event) {
     var senderID = event.sender.id;
@@ -741,8 +741,8 @@ function sendReceiptMessage(recipientId, cusName, foodName, foodImg, price, tax,
 
 
 /*
- * Call the Send API. The message data goes in the body. If successful, we'll 
- * get the message id in a response 
+ * Call the Send API. The message data goes in the body. If successful, we'll
+ * get the message id in a response
  *
  */
 function callSendAPI(messageData) {
@@ -770,7 +770,11 @@ function callSendAPI(messageData) {
     });
 }
 
+<<<<<<< master
 app.listen(app.get('port'), function () {
+=======
+app.listen(app.get('port'), function() {
+>>>>>>> refactor code
     console.log('Node app is running on port', app.get('port'));
 });
 
