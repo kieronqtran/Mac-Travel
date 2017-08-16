@@ -15,12 +15,6 @@
     "MESSENGER_VALIDATION_TOKEN": {
       "value": "mactravel"
     },
-    "NODE_ENV": {
-      "value": "development"
-    },
-    "FACEBOOK_API_VERSION": {
-      "value": "v2.9"
-    },
     "FACEBOOK_PAGE_ID": {
       "required": true
     },
