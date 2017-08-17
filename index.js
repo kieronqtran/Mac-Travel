@@ -91,7 +91,6 @@ app.post('/webhook', function (req, res) {
 function checkTime(senderID){
   var date = new Date();
   var hour = date.getHours() + 7;
-  //var x = time + 8;
   if (hour < 12) 
     { sendTextMessage(senderID, "Good morning, customer");  }
   if (hour >= 12 && hour < 18)
