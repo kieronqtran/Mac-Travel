@@ -164,17 +164,17 @@ function receivedMessage(event) {
             case 'big macs':
             case 'big mac':
                 sendBigMac(senderID);
-                break top;
+                break;
 
             case 'big macs':
             case 'big mac':
                 sendBigMac(senderID);
-                break top;
+                break;
 
             case "i want some drink":
                 sendTextMessage(senderID, "This is our drink menu. Please click on the option that you want.");
                 sendDrinkMenu(senderID);
-                break top;
+                break;
 
             default:
                 var messageList = messageText.split(/[\s,]+/);
@@ -244,9 +244,9 @@ function receivedMessage(event) {
 /*
  * Postback Event
  *
- * This event is called when a postback is tapped on a Structured Message.
+ * This event is called when a postback is tapped on a Structured Message. 
  * https://developers.facebook.com/docs/messenger-platform/webhook-reference/postback-received
- *
+ * 
  */
 function receivedPostback(event) {
     var senderID = event.sender.id;
@@ -395,8 +395,7 @@ function sendBurgerMenu(recipientId) {
                 }
             }
         }
-    };
-
+    }
     callSendAPI(messageData);
 }
 
@@ -486,8 +485,7 @@ function sendDrinkMenu(recipientId) {
                 }
             }
         }
-    };
-
+    }
     callSendAPI(messageData);
 }
 
@@ -567,7 +565,7 @@ function processPostback(event) {
     var payload = event.postback.payload;
     if (payload === "Greeting") {
         request({
-            url: "https://graph.facebook.com/v2.9/" + senderId,
+            url: "https://graph.facebook.com/v2.6/" + senderId,
             qs: {
                 access_token: PAGE_ACCESS_TOKEN,
                 fields: "first_name, last_name"
@@ -644,7 +642,7 @@ function processPostback(event) {
     } else if (payload === ("Confirm " + foodName)) {
         sendMessage(senderId, { text: "Your order is successful." });
         request({
-            url: "https://graph.facebook.com/v2.9/" + senderId,
+            url: "https://graph.facebook.com/v2.6/" + senderId,
             qs: {
                 access_token: PAGE_ACCESS_TOKEN,
                 fields: "first_name, last_name"
@@ -677,7 +675,7 @@ function processPostback(event) {
 
 function sendMessage(recipientId, message) {
     request({
-        url: "https://graph.facebook.com/v2.9/me/messages",
+        url: "https://graph.facebook.com/v2.6/me/messages",
         qs: { access_token: PAGE_ACCESS_TOKEN },
         method: "POST",
         json: {
@@ -739,15 +737,62 @@ function sendReceiptMessage(recipientId, cusName, foodName, foodImg, price, tax,
     callSendAPI(messageData);
 }
 
+function sendReceiptMessage(recipientId, cusName, foodName, foodImg, price, tax, totalCost, shippingCost, time) {
+    // Generate a random receipt ID as the API requires a unique ID
+    var receiptId = "order" + Math.floor(Math.random() * 1000);
+
+    var messageData = {
+        recipient: {
+            id: recipientId
+        },
+        message: {
+            attachment: {
+                type: "template",
+                payload: {
+                    template_type: "receipt",
+                    recipient_name: cusName,
+                    order_number: receiptId,
+                    currency: "VND",
+                    payment_method: "Cash",
+                    timestamp: time,
+                    elements: [{
+                        title: foodName,
+                        subtitle: "Voucher included",
+                        quantity: 1,
+                        price: price,
+                        currency: "VND",
+                        image_url: foodImg
+                    }],
+                    address: {
+                        street_1: "702 Nguyen Van Linh",
+                        city: "Ho Chi Minh",
+                        postal_code: "700000",
+                        state: "HCM",
+                        country: "VN"
+                    },
+                    summary: {
+                        subtotal: price,
+                        shipping_cost: shippingCost,
+                        total_tax: tax,
+                        total_cost: totalCost
+                    }
+                }
+            }
+        }
+    };
+
+    callSendAPI(messageData);
+}
+
 
 /*
- * Call the Send API. The message data goes in the body. If successful, we'll
- * get the message id in a response
+ * Call the Send API. The message data goes in the body. If successful, we'll 
+ * get the message id in a response 
  *
  */
 function callSendAPI(messageData) {
     request({
-        uri: 'https://graph.facebook.com/v2.9/me/messages',
+        uri: 'https://graph.facebook.com/v2.6/me/messages',
         qs: { access_token: PAGE_ACCESS_TOKEN },
         method: 'POST',
         json: messageData
@@ -770,11 +815,7 @@ function callSendAPI(messageData) {
     });
 }
 
-<<<<<<< master
 app.listen(app.get('port'), function () {
-=======
-app.listen(app.get('port'), function() {
->>>>>>> refactor code
     console.log('Node app is running on port', app.get('port'));
 });
 
