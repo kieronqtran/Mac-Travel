@@ -395,7 +395,8 @@ function sendBurgerMenu(recipientId) {
                 }
             }
         }
-    }
+    };
+
     callSendAPI(messageData);
 }
 
@@ -485,7 +486,8 @@ function sendDrinkMenu(recipientId) {
                 }
             }
         }
-    }
+    };
+
     callSendAPI(messageData);
 }
 
@@ -565,7 +567,7 @@ function processPostback(event) {
     var payload = event.postback.payload;
     if (payload === "Greeting") {
         request({
-            url: "https://graph.facebook.com/v2.6/" + senderId,
+            url: "https://graph.facebook.com/v2.9/" + senderId,
             qs: {
                 access_token: PAGE_ACCESS_TOKEN,
                 fields: "first_name, last_name"
@@ -642,7 +644,7 @@ function processPostback(event) {
     } else if (payload === ("Confirm " + foodName)) {
         sendMessage(senderId, { text: "Your order is successful." });
         request({
-            url: "https://graph.facebook.com/v2.6/" + senderId,
+            url: "https://graph.facebook.com/v2.9/" + senderId,
             qs: {
                 access_token: PAGE_ACCESS_TOKEN,
                 fields: "first_name, last_name"
@@ -792,7 +794,7 @@ function sendReceiptMessage(recipientId, cusName, foodName, foodImg, price, tax,
  */
 function callSendAPI(messageData) {
     request({
-        uri: 'https://graph.facebook.com/v2.6/me/messages',
+        uri: 'https://graph.facebook.com/v2.9/me/messages',
         qs: { access_token: PAGE_ACCESS_TOKEN },
         method: 'POST',
         json: messageData
