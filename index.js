@@ -579,7 +579,7 @@ function processPostback(event) {
             url: "https://graph.facebook.com/v2.6/" + senderId,
             qs: {
                 access_token: PAGE_ACCESS_TOKEN,
-                fields: "first_name"
+                fields: "first_name, last_name"
             },
             method: "GET"
         }, function(error, response, body) {
@@ -588,8 +588,9 @@ function processPostback(event) {
                 console.log("Error getting user's name: " +  error);
             } else {
                 var bodyObj = JSON.parse(body);
-                var name = bodyObj.first_name;
-                greeting = "Hi " + name + ". ";
+                var fname = bodyObj.first_name;
+                var lname = bodyObj.last_name;
+                greeting = "Hi " + fname + " " + lname + ". ";
             }
             var message = greeting + "Welcome to MACTravel for the first time.";
             sendMessage(senderId, {text: message});
