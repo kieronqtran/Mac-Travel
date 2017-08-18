@@ -12,6 +12,9 @@
     "MESSENGER_VALIDATION_TOKEN": {
       "value": "mactravel"
     },
+    "DATABASE_LOCATION": {
+      "value": "db.json"
+    },
     "SERVER_URL": {
       "required": true
     }
