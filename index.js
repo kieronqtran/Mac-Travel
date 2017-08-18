@@ -677,7 +677,7 @@ function processPostback(event) {
 
 function sendMessage(recipientId, message) {
     request({
-        url: "https://graph.facebook.com/v2.6/me/messages",
+        url: "https://graph.facebook.com/v2.9/me/messages",
         qs: { access_token: PAGE_ACCESS_TOKEN },
         method: "POST",
         json: {
@@ -738,54 +738,6 @@ function sendReceiptMessage(recipientId, cusName, foodName, foodImg, price, tax,
 
     callSendAPI(messageData);
 }
-
-function sendReceiptMessage(recipientId, cusName, foodName, foodImg, price, tax, totalCost, shippingCost, time) {
-    // Generate a random receipt ID as the API requires a unique ID
-    var receiptId = "order" + Math.floor(Math.random() * 1000);
-
-    var messageData = {
-        recipient: {
-            id: recipientId
-        },
-        message: {
-            attachment: {
-                type: "template",
-                payload: {
-                    template_type: "receipt",
-                    recipient_name: cusName,
-                    order_number: receiptId,
-                    currency: "VND",
-                    payment_method: "Cash",
-                    timestamp: time,
-                    elements: [{
-                        title: foodName,
-                        subtitle: "Voucher included",
-                        quantity: 1,
-                        price: price,
-                        currency: "VND",
-                        image_url: foodImg
-                    }],
-                    address: {
-                        street_1: "702 Nguyen Van Linh",
-                        city: "Ho Chi Minh",
-                        postal_code: "700000",
-                        state: "HCM",
-                        country: "VN"
-                    },
-                    summary: {
-                        subtotal: price,
-                        shipping_cost: shippingCost,
-                        total_tax: tax,
-                        total_cost: totalCost
-                    }
-                }
-            }
-        }
-    };
-
-    callSendAPI(messageData);
-}
-
 
 /*
  * Call the Send API. The message data goes in the body. If successful, we'll 
