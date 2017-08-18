@@ -3,6 +3,17 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const request = require('request');
+const {
+    APP_SECRET,
+    VALIDATION_TOKEN,
+    PAGE_ACCESS_TOKEN,
+    SERVER_URL,
+    } = require('./config');
+
+if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
+    console.error("Missing config values");
+    process.exit(1);
+}
 
 const app = express();
 app.set('port', process.env.PORT || 5000);
@@ -13,32 +24,10 @@ app.get('/', function (req, res) {
     res.send('Hi! This is my chatbot.');
 });
 
-
-// App Secret can be retrieved from the App Dashboard
-const APP_SECRET = (process.env.APP_SECRET);
-
-// Arbitrary value used to validate a webhook
-const VALIDATION_TOKEN = (process.env.MESSENGER_VALIDATION_TOKEN);
-
-
-// Generate a page access token for your page from the App Dashboard
-const PAGE_ACCESS_TOKEN = (process.env.FB_ACCESS_TOKEN);
-
-
-// URL where the app is running (include protocol). Used to point to scripts and 
-// assets located at this address. 
-const SERVER_URL = (process.env.SERVER_URL);
-
-
-if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
-    console.error("Missing config values");
-    process.exit(1);
-}
-
 // Validating token
 app.get('/webhook', function (req, res) {
     if (req.query['hub.mode'] === 'subscribe' &&
-        req.query['hub.verify_token'] === "this_is_my_token") {
+        req.query['hub.verify_token'] === VALIDATION_TOKEN) {
         console.log("Validating webhook");
         res.status(200).send(req.query['hub.challenge']);
     } else {
@@ -86,8 +75,6 @@ app.post('/webhook', function (req, res) {
     }
 });
 
-
-
 function checkTime(senderID) {
     var date = new Date();
     var hour = date.getHours() + 7;
@@ -113,7 +100,7 @@ function receivedMessage(event) {
 
     console.log("Received message for user %d and page %d at %d with message:",
         senderID, recipientID, timeOfMessage);
-    console.log(JSON.stringify(message));
+    console.log(JSON.stringify(message, null, 4));
 
     var messageId = message.mid;
     var appId = message.app_id;

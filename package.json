@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "Get started example for Messenger Platform",
   "private": true,
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "mocha --recursive --reporter spec --ui bdd -w **/*.js --require './tests/util/setup.js' ./tests/**/*.spec.js"
   },
   "repository": {
     "type": "git",
