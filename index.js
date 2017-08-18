@@ -161,10 +161,20 @@ function receivedMessage(event) {
                 sendBurgerMenu(senderID);
                 break;
 
-            case "i want some drink":
-                sendTextMessage(senderID, "This is our drink menu. Please click on the option that you want.");
-                sendDrinkMenu(senderID);
-                break;
+                case 'big macs':
+                case 'big mac':
+                    sendBigMac(senderID);
+                    break top;
+
+                case 'big macs':
+                case 'big mac':
+                    sendBigMac(senderID);
+                    break top;
+
+                case "i want some drink":
+                    sendTextMessage(senderID, "This is our drink menu. Please click on the option that you want.");
+                    sendDrinkMenu(senderID);
+                    break top;
 
             default:
                 var messageList = messageText.split(/[\s,]+/);
@@ -200,9 +210,22 @@ function receivedMessage(event) {
                             sendTextMessage(senderID, "Do you mean our website? If yes, this is it https://www.mcdonalds.com/us/en-us.html");
                             break top;
 
-                        default:
-                            if (i == (messageList.length - 1)) {
-                                sendTextMessage(senderID, "I don't quite catch that. Please try again");
+                            case 'bigmac':
+                            case 'big mac':
+                            case 'bigmacs':
+                            case 'big macs':
+                                sendBigMac(senderID);
+                                break top;
+
+                            case 'bigmac':
+                            case 'big mac':
+                            case 'bigmacs':
+                            case 'big macs':
+                                sendBigMac(senderID);
+                                break top;
+
+                            case 'website':
+                                sendTextMessage(senderID, "Do you mean our website? If yes, this is it https://www.mcdonalds.com/us/en-us.html");
                                 break top;
                             }
                             else continue;
@@ -464,6 +487,42 @@ function sendDrinkMenu(recipientId) {
     callSendAPI(messageData);
 }
 
+function sendBigMac(recipientId) {
+    var messageData = {
+        recipient: {
+            id: recipientId
+        },
+        message: {
+            attachment: {
+                type: "template",
+                payload: {
+                    template_type: "generic",
+                    elements: [{
+                        title: "Big Mac",
+                        subtitle: "The one and only.",
+                        item_url: "https://www.mcdonalds.com/us/en-us/product/big-mac.html",
+                        image_url: "https://www.mcdonalds.com/content/dam/usa/promotions/mobile/extravaluemeal-mobile.jpg",
+                        buttons: [{
+                            type: "web_url",
+                            url: "https://www.mcdonalds.com/us/en-us/product/big-mac.html",
+                            title: "Open Website"
+                        }, {
+                            type: "postback",
+                            title: "Order This Burger",
+                            payload: "Big Mac",
+                        }, {
+                            type: "postback",
+                            title: "Exit",
+                            payload: "Exit Big Mac",
+                        }]
+                    }]
+                }
+            }
+        }
+    };
+
+    callSendAPI(messageData);
+}
 
 function confirmingOrder(recipientId, foodType) {
     var messageData = {
