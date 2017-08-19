@@ -3,6 +3,7 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const request = require('request');
+const productRepository = require('./repository/product.repository');
 const {
     APP_SECRET,
     VALIDATION_TOKEN,
@@ -35,8 +36,6 @@ app.get('/webhook', function (req, res) {
         res.sendStatus(403);
     }
 });
-
-
 /*
  * All callbacks for Messenger are POST-ed. They will be sent to the same
  * webhook. Be sure to subscribe your app to your page to receive callbacks
@@ -148,15 +147,15 @@ function receivedMessage(event) {
                 sendBurgerMenu(senderID);
                 break;
 
-            case 'big macs':
-            case 'big mac':
-                sendBigMac(senderID);
-                break;
+            // case 'big macs':
+            // case 'big mac':
+            //     sendBigMac(senderID);
+            //     break;
 
-            case 'big macs':
-            case 'big mac':
-                sendBigMac(senderID);
-                break;
+            // case 'big macs':
+            // case 'big mac':
+            //     sendBigMac(senderID);
+            //     break;
 
             case "i want some drink":
                 sendTextMessage(senderID, "This is our drink menu. Please click on the option that you want.");
@@ -197,19 +196,19 @@ function receivedMessage(event) {
                             sendTextMessage(senderID, "Do you mean our website? If yes, this is it https://www.mcdonalds.com/us/en-us.html");
                             break top;
 
-                        case 'bigmac':
-                        case 'big mac':
-                        case 'bigmacs':
-                        case 'big macs':
-                            sendBigMac(senderID);
-                            break top;
+                        // case 'bigmac':
+                        // case 'big mac':
+                        // case 'bigmacs':
+                        // case 'big macs':
+                        //     sendBigMac(senderID);
+                        //     break top;
 
-                        case 'bigmac':
-                        case 'big mac':
-                        case 'bigmacs':
-                        case 'big macs':
-                            sendBigMac(senderID);
-                            break top;
+                        // case 'bigmac':
+                        // case 'big mac':
+                        // case 'bigmacs':
+                        // case 'big macs':
+                        //     sendBigMac(senderID);
+                        //     break top;
 
                         case 'website':
                             sendTextMessage(senderID, "Do you mean our website? If yes, this is it https://www.mcdonalds.com/us/en-us.html");
@@ -313,207 +312,91 @@ function sendMenuMessage(recipientId) {
     callSendAPI(messageData);
 }
 
-
 function sendBurgerMenu(recipientId) {
-    var messageData = {
-        recipient: {
-            id: recipientId
+  const burgers = productRepository.getAllBurgers(); // get all burgers in product
+  // map all the product information to each facebook generic template
+  const payloadElements = burgers.map(burger => {
+    return {
+      title: burger.name,
+      subtitle: burger.description,
+      item_url: burger.item_url,
+      image_url: burger.image_url,
+      buttons: [
+        {
+          type: 'web_url',
+          url: burger.item_url,
+          title: 'Open Website',
         },
-        message: {
-            attachment: {
-                type: "template",
-                payload: {
-                    template_type: "generic",
-                    elements: [{
-                        title: "Big Mac",
-                        subtitle: "The one and only.",
-                        item_url: "https://www.mcdonalds.com/us/en-us/product/big-mac.html",
-                        image_url: "https://www.mcdonalds.com/content/dam/usa/promotions/mobile/extravaluemeal-mobile.jpg",
-                        buttons: [{
-                            type: "web_url",
-                            url: "https://www.mcdonalds.com/us/en-us/product/big-mac.html",
-                            title: "Open Website"
-                        }, {
-                            type: "postback",
-                            title: "Order This Burger",
-                            payload: "Big Mac",
-                        }, {
-                            type: "postback",
-                            title: "Exit",
-                            payload: "Exit Big Mac",
-                        }]
-                    }, {
-                        title: "Sweet BBQ Bacon",
-                        subtitle: "Tangy, Sweet, Juicy",
-                        item_url: "https://www.mcdonalds.com/us/en-us/product/sweet-bbq-bacon-burger-on-sesame-seed-bun-202504.html",
-                        image_url: "http://static6.businessinsider.com/image/590cea94dd08959c288b4aeb-1207/sweet%20bbq%20mcdonalds%20bacon%20burger.png",
-                        buttons: [{
-                            type: "web_url",
-                            url: "https://www.mcdonalds.com/us/en-us/product/sweet-bbq-bacon-burger-on-sesame-seed-bun-202504.html",
-                            title: "Open Website"
-                        }, {
-                            type: "postback",
-                            title: "Order This Burger",
-                            payload: "Sweet BBQ Bacon",
-                        }, {
-                            type: "postback",
-                            title: "Exit",
-                            payload: "Exit BBQ",
-                        }]
-                    }, {
-                        title: "Signature Sriracha Burger",
-                        subtitle: "Spicy meets saucy",
-                        item_url: "https://www.mcdonalds.com/us/en-us/product/sriracha-burger-on-artisan-roll.html",
-                        image_url: "http://del.h-cdn.co/assets/17/29/980x490/landscape-1500316280-sriracha-burger.png",
-                        buttons: [{
-                            type: "web_url",
-                            url: "https://www.mcdonalds.com/us/en-us/product/sriracha-burger-on-artisan-roll.html",
-                            title: "Open Website"
-                        }, {
-                            type: "postback",
-                            title: "Order This Burger",
-                            payload: "Signature Sriracha",
-                        }, {
-                            type: "postback",
-                            title: "Exit",
-                            payload: "Exit Signature",
-                        }]
-                    }]
-                }
-            }
-        }
+        {
+          type: 'postback',
+          title: 'Order This Burger',
+          payload: burger.payload_name,
+        },
+        {
+          type: 'postback',
+          title: 'Exit',
+          payload: 'EXIT_' + burger.payload_name,
+        },
+      ],
     };
+  });
+  const messageData = {
+    recipient: {
+      id: recipientId,
+    },
+    message: {
+      attachment: {
+        type: 'template',
+        payload: {
+          template_type: 'generic',
+          elements: payloadElements,
+        },
+      },
+    },
+  };
+  console.log(
+    `BurgerMenu Messeage Data: ${JSON.stringify(messageData, null, 4)}`
+  );
 
-    callSendAPI(messageData);
+    callSendAPI(messageData);  
 }
 
-function sendDrinkMenu(recipientId) {
-    var messageData = {
-        recipient: {
-            id: recipientId
-        },
-        message: {
-            attachment: {
-                type: "template",
-                payload: {
-                    template_type: "generic",
-                    elements: [{
-                        title: "Chocolate Shake",
-                        subtitle: "Chocolaty perfection.",
-                        item_url: "https://www.mcdonalds.com/us/en-us/product/chocolate-shake-small.html",
-                        image_url: "http://s.eatthis-cdn.com/media/images/ext/907498607/mcdonalds-menu-dessert-shake-chocolate.jpg",
-                        buttons: [{
-                            type: "web_url",
-                            url: "https://www.mcdonalds.com/us/en-us/product/chocolate-shake-small.html",
-                            title: "Open Website"
-                        }, {
-                            type: "postback",
-                            title: "Order This Drink",
-                            payload: "Chocolate Shake",
-                        }, {
-                            type: "postback",
-                            title: "Exit",
-                            payload: "Exit Chocolate",
-                        }]
-                    }, {
-                        title: "Coca-Cola",
-                        subtitle: "The burger's companion.",
-                        item_url: "https://www.mcdonalds.com/us/en-us/product/coca-cola-small.html",
-                        image_url: "https://technabob.com/blog/wp-content/uploads/2017/03/mcdonalds_coke_1.jpg",
-                        buttons: [{
-                            type: "web_url",
-                            url: "https://www.mcdonalds.com/us/en-us/product/coca-cola-small.html",
-                            title: "Open Website"
-                        }, {
-                            type: "postback",
-                            title: "Order This Drink",
-                            payload: "Coca Cola",
-                        }, {
-                            type: "postback",
-                            title: "Exit",
-                            payload: "Exit Cola",
-                        }]
-                    }, {
-                        title: "McCafé Coffee",
-                        subtitle: "Invigorate your morning.",
-                        item_url: "https://www.mcdonalds.com/us/en-us/product/coffee-small.html",
-                        image_url: "http://cdn0.wideopeneats.com/wp-content/uploads/2016/12/mccafe.jpg",
-                        buttons: [{
-                            type: "web_url",
-                            url: "https://www.mcdonalds.com/us/en-us/product/coffee-small.html",
-                            title: "Open Website"
-                        }, {
-                            type: "postback",
-                            title: "Order This Drink",
-                            payload: "Mc Coffee",
-                        }, {
-                            type: "postback",
-                            title: "Exit",
-                            payload: "Exit Coffee",
-                        }]
-                    }, {
-                        title: "Strawberry Shake",
-                        subtitle: "A real sweetie.",
-                        item_url: "https://www.mcdonalds.com/us/en-us/product/strawberry-shake-small.html",
-                        image_url: "http://thatoregonlife.com/wp-content/uploads/2016/03/mccafe2.png",
-                        buttons: [{
-                            type: "web_url",
-                            url: "https://www.mcdonalds.com/us/en-us/product/strawberry-shake-small.html",
-                            title: "Open Website"
-                        }, {
-                            type: "postback",
-                            title: "Order This Drink",
-                            payload: "Strawberry Shake",
-                        }, {
-                            type: "postback",
-                            title: "Exit",
-                            payload: "Exit Strawberry",
-                        }]
-                    }]
-                }
-            }
-        }
-    };
+// function sendBigMac(recipientId) {
+//     var messageData = {
+//         recipient: {
+//             id: recipientId
+//         },
+//         message: {
+//             attachment: {
+//                 type: "template",
+//                 payload: {
+//                     template_type: "generic",
+//                     elements: [{
+//                         title: "Big Mac",
+//                         subtitle: "The one and only.",
+//                         item_url: "https://www.mcdonalds.com/us/en-us/product/big-mac.html",
+//                         image_url: "https://www.mcdonalds.com/content/dam/usa/promotions/mobile/extravaluemeal-mobile.jpg",
+//                         buttons: [{
+//                             type: "web_url",
+//                             url: "https://www.mcdonalds.com/us/en-us/product/big-mac.html",
+//                             title: "Open Website"
+//                         }, {
+//                             type: "postback",
+//                             title: "Order This Burger",
+//                             payload: "Big Mac",
+//                         }, {
+//                             type: "postback",
+//                             title: "Exit",
+//                             payload: "Exit Big Mac",
+//                         }]
+//                     }]
+//                 }
+//             }
+//         }
+//     };
 
-    callSendAPI(messageData);
-}
-
-function sendBigMac(recipientId) {
-    var messageData = {
-        recipient: {
-            id: recipientId
-        },
-        message: {
-            attachment: {
-                type: "template",
-                payload: {
-                    template_type: "generic",
-                    elements: [{
-                        title: "Big Mac",
-                        subtitle: "The one and only.",
-                        item_url: "https://www.mcdonalds.com/us/en-us/product/big-mac.html",
-                        image_url: "https://www.mcdonalds.com/content/dam/usa/promotions/mobile/extravaluemeal-mobile.jpg",
-                        buttons: [{
-                            type: "web_url",
-                            url: "https://www.mcdonalds.com/us/en-us/product/big-mac.html",
-                            title: "Open Website"
-                        }, {
-                            type: "postback",
-                            title: "Order This Burger",
-                            payload: "Big Mac",
-                        }, {
-                            type: "postback",
-                            title: "Exit",
-                            payload: "Exit Big Mac",
-                        }]
-                    }]
-                }
-            }
-        }
-    };
-
-    callSendAPI(messageData);
-}
+//     callSendAPI(messageData);
+// }
 
 function confirmingOrder(recipientId, foodType) {
     var messageData = {
@@ -579,7 +462,7 @@ function processPostback(event) {
     } else if (payload === "Drink Menu") {
         sendMessage(senderId, { text: "Please click on the option that you want." });
         sendDrinkMenu(senderId);
-    } else if (payload === "Big Mac") {
+    } else if (payload === "BIG_MAC") {
         foodName = "Big Mac";
         foodImg = "https://www.mcdonalds.com/content/dam/usa/promotions/mobile/extravaluemeal-mobile.jpg";
         price = 55000;
@@ -614,9 +497,9 @@ function processPostback(event) {
         foodImg = "http://thatoregonlife.com/wp-content/uploads/2016/03/mccafe2.png";
         price = 30000;
         confirmingOrder(senderId, foodName);
-    } else if (payload === "Exit Big Mac") {
+    } else if (payload === "EXIT_BIG_MAC") {
         sendMessage(senderId, { text: "Perhaps you don't love Big Mac. Please tell me what you like." });
-    } else if (payload === "Exit BBQ") {
+    } else if (payload === "EXIT_SWEET_BBQ_BACON") {
         sendMessage(senderId, { text: "Maybe Sweet BBQ Bacon is not for today. Please tell me what I should do next." });
     } else if (payload === "Exit Signature") {
         sendMessage(senderId, { text: "Signature Sriracha Burger might not be your favorite, but please tell me other options" });
