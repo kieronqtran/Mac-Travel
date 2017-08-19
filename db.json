@@ -22,6 +22,17 @@
       "id": 1
     },
     {
+      "name": "Signature Sriracha Burger",
+      "type": "Burger",
+      "item_url": "https://www.mcdonalds.com/us/en-us/product/sriracha-burger-on-artisan-roll.html",
+      "image_url": "http://del.h-cdn.co/assets/17/29/980x490/landscape-1500316280-sriracha-burger.png",
+      "unit_price": 55000,
+      "currency": "VND",
+      "description": "Spicy meets saucy.",
+      "payload_name": "SIGNATURE_SRIRACHA_BURGER",
+      "id": 2
+    },
+    {
       "name": "Sweet BBQ Bacon",
       "type": "Burger",
       "item_url": "https://www.mcdonalds.com/us/en-us/product/sweet-bbq-bacon-burger-on-sesame-seed-bun-202504.html",
@@ -29,8 +40,8 @@
       "unit_price": 55000,
       "currency": "VND",
       "description": "Tangy, Sweet, Juicy",
-      "payload_name": "BIG_MAC",
-      "id": 2
+      "payload_name": "SWEET_BBQ_BACON",
+      "id": 3
     },
     {
       "name": "Chocolate Shake",
@@ -41,7 +52,7 @@
       "currency": "VND",
       "description": "Chocolaty perfection.",
       "payload_name": "CHOCOLATE_SHAKE",
-      "id": 3
+      "id": 4
     },
     {
       "name": "Coca-Cola",
@@ -51,7 +62,7 @@
       "unit_price": 20000,
       "currency": "VND",
       "description": "The burger's companion.",
-      "id": 4
+      "id": 5
     },
     {
       "name": "McCafé Coffee",
@@ -62,7 +73,7 @@
       "currency": "VND",
       "description": "Invigorate your morning.",
       "payload_name": "MCCAFE_COFFEE",
-      "id": 5
+      "id": 6
     },
     {
       "name": "Strawberry Shake",
@@ -73,7 +84,7 @@
       "currency": "VND",
       "description": "A real sweetie.",
       "payload_name": "STRAWBERRY_SHAKE",
-      "id": 6
+      "id": 7
     }
   ],
   "orders": [
@@ -124,7 +135,7 @@
             "currency": "VND",
             "description": "Invigorate your morning.",
             "payload_name": "MCCAFE_COFFEE",
-            "id": 5
+            "id": 6
           }
         }
       ],
