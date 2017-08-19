@@ -357,6 +357,8 @@ function sendBurgerMenu(recipientId) {
   console.log(
     `BurgerMenu Messeage Data: ${JSON.stringify(messageData, null, 4)}`
   );
+
+    callSendAPI(messageData);  
 }
 
 // function sendBigMac(recipientId) {
