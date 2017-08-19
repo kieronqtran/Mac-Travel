@@ -1,6 +1,5 @@
-'use strict';
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-
-chai.should();
-chai.use(chaiAsPromised);
+const dbJson = require('../../db.json');
+const db = require('../../db');
+exports.flushDb = function () {
+  db.setState(dbJson);
+}

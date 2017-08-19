@@ -1,9 +1,10 @@
 const shoppingCartSevice = require('../service/shoppingcart.service');
+const orderRepository = require('../repository/order.repository');
+const util = require('./util/util');
 
 describe('Shopping Cart Service', () => {
   const senderId = '2042621042422137';
   const exampleBill = {
-    id: 1,
     order_id: '59656934',
     payment_type: 'Cash',
     concurrency: 'VND',
@@ -30,7 +31,7 @@ describe('Shopping Cart Service', () => {
           type: 'Burger',
           item_url: 'https://www.mcdonalds.com/us/en-us/product/big-mac.html',
           image_url:
-            'https://www.mcdonalds.com/content/dam/usa/promotions/mobile/extravaluemeal-mobile.jpg',
+          'https://www.mcdonalds.com/content/dam/usa/promotions/mobile/extravaluemeal-mobile.jpg',
           unit_price: 65000,
           description: 'The one and only.',
           id: 1,
@@ -43,9 +44,9 @@ describe('Shopping Cart Service', () => {
           name: 'McCafé Coffee',
           type: 'Drink',
           item_url:
-            'https://www.mcdonalds.com/us/en-us/product/coffee-small.html',
+          'https://www.mcdonalds.com/us/en-us/product/coffee-small.html',
           image_url:
-            'http://cdn0.wideopeneats.com/wp-content/uploads/2016/12/mccafe.jpg',
+          'http://cdn0.wideopeneats.com/wp-content/uploads/2016/12/mccafe.jpg',
           unit_price: 20000,
           description: 'Invigorate your morning.',
           id: 5,
@@ -62,29 +63,31 @@ describe('Shopping Cart Service', () => {
     },
   };
 
-  it('should get the current bill of user', () => {
-    throw Error('not implemented');
+  beforeEach(() => {
+    util.flushDb();
   });
 
-  it('should add a item to the list', () => {});
+  afterEach(() => {
+    util.flushDb();
+  })
 
-  it('should add a payment type', () => {
-    throw Error('not implemented');
+  it.skip('should get the current bill of user', () => {
   });
 
-  it('should add a shipping address', () => {
-    throw Error('not implemented');
+  it.skip('should add a item to the list', () => { });
+
+  it.skip('should add a payment type', () => {
   });
 
-  it('should remove an item in order', () => {
-    throw Error('not implemented');
+  it.skip('should add a shipping address', () => {
   });
 
-  it('should remove an order', () => {
-    throw Error('not implemented');
+  it.skip('should remove an item in order', () => {
   });
 
-  it('should get the recript', () => {
-    throw Error('not implemented');
+  it.skip('should remove an order', () => {
+  });
+
+  it.skip('should get the recript', () => {
   });
 });

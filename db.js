@@ -1,7 +1,15 @@
 const low = require('lowdb');
-const { DATABASE_LOCATION } = require('./config');
+const { DATABASE_LOCATION, environments } = require('./config');
+const dbJson = require('./db.json');
 const fileAsync = require('lowdb/lib/storages/file-async');
-const db = low(DATABASE_LOCATION, { storage: fileAsync }); // remember to print to file
+
+const location = environments.test ? 'db.test.json' : DATABASE_LOCATION;
+
+const db = low(location, { storage: fileAsync }); // remember to print to file
+
+if (environments.test) {
+  db.defaults(dbJson).write();
+}
 
 db._.mixin(require('lodash-id'));
 db._.mixin({

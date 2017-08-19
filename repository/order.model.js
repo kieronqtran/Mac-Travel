@@ -1,3 +1,3 @@
-module.Order = class {};
+module.Order = class {
 
-module.OrderDetail = class {};
+};
