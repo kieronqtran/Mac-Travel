@@ -153,11 +153,6 @@ function receivedMessage(event) {
                 sendBigMac(senderID);
                 break;
 
-            case 'big macs':
-            case 'big mac':
-                sendBigMac(senderID);
-                break;
-
             case "i want some drink":
                 sendTextMessage(senderID, "This is our drink menu. Please click on the option that you want.");
                 sendDrinkMenu(senderID);
@@ -195,13 +190,6 @@ function receivedMessage(event) {
 
                         case 'website':
                             sendTextMessage(senderID, "Do you mean our website? If yes, this is it https://www.mcdonalds.com/us/en-us.html");
-                            break top;
-
-                        case 'bigmac':
-                        case 'big mac':
-                        case 'bigmacs':
-                        case 'big macs':
-                            sendBigMac(senderID);
                             break top;
 
                         case 'bigmac':
