@@ -14,7 +14,9 @@ describe('Orders Repository', () => {
     "total_cost": 87000,
     "total_tax": 8700,
     "checkouted": true,
-    "timestamp": "1428444852",
+    "checkoutTime": "1503154662671",
+    "updatedTime": "1503154662671",
+    "createdTime": "1503154662671",
     "order_user": {
       "id": 1,
       "facebook_id": "2042621042422137",
@@ -87,10 +89,34 @@ describe('Orders Repository', () => {
       .should.eventually.have.lengthOf(1);
   });
 
-  it('should get order with condition', () => {
+  it('should get an order with condition', () => {
     return orderRepository
       .findAllWith({ order_user: { facebook_id: exampleOrder.order_user.facebook_id } })
       .should.eventually.to.eql([exampleOrder]);
+  });
+
+  it('should get an unchecked out order', () => {
+    orderRepository
+      .insert({
+        "order_id": Math.floor(Math.random() * 100000000).toString(),
+        "payment_type": "Cash",
+        "currency": "VND",
+        "subtotal": 0,
+        "shipping_cost": 0,
+        "total_cost": 0,
+        "total_tax": 0,
+        "checkouted": false,
+        "checkoutTime": null,
+        "order_user": exampleOrder.order_user,
+        "order_details": [],
+        "shipping_address": null
+      })
+      .then(expectedOrder =>
+        orderRepository
+          .getUncheckedoutOrder(exampleOrder.order_user.facebook_id)
+          .should.eventually.to.equal(expectedOrder)
+      // .notify(done)
+      );
   });
 
   it('should find a particular order', () => {
@@ -110,10 +136,10 @@ describe('Orders Repository', () => {
       .should.eventually.to.equal(2);
   });
 
-  it('should remove an order', () => {
+  it('should remove an order', done => {
     let expectedOrder = Object.assign({}, exampleOrder);
     delete expectedOrder.id;
-    return db
+    db
       .upsert(expectedOrder)
       .write()
       .then(order => {
@@ -123,7 +149,7 @@ describe('Orders Repository', () => {
       .then(order => {
         return db.getById(order.id).value();
       })
-      .should.eventually.to.be.undefined;
+      .should.eventually.to.be.undefined.notify(done);
   });
 
   it('should update an order', () => {

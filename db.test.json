@@ -98,7 +98,9 @@
       "total_cost": 87000,
       "total_tax": 8700,
       "checkouted": true,
-      "timestamp": "1428444852",
+      "checkoutTime": "1503154662671",
+      "updatedTime": "1503154662671",
+      "createdTime": "1503154662671",
       "order_user": {
         "id": 1,
         "facebook_id": "2042621042422137",
