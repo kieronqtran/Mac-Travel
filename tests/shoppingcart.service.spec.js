@@ -234,6 +234,33 @@ describe.only('Shopping Cart Service', () => {
       });
   });
 
+  it('should set to 0 if quantity parameter is smaller than 0', () => {
+    const burger = productRepository.getBurgerByName('Big Mac');
+    const coke = productRepository.getDrinkByName('Coca-Cola');
+    const userOrder = shoppingCartSevice.forUser(senderId);
+    return userOrder
+      .addItem(burger)
+      .then(() => userOrder.addItem(coke))
+      .then(() => userOrder.setQuantityOfItem(burger, -1))
+      .then(() => orderRepository.getUncheckedoutOrder(senderId))
+      .then(order => {
+        const order_details = order.order_details;
+        const subtotal = burger.unit_price * 0 + coke.unit_price;
+        const shippingCost = 0;
+        const taxRate = 0.1;
+        order.subtotal.should.equal(subtotal);
+        order.total_cost.should.equal(subtotal + shippingCost);
+        order.total_tax.should.equal(subtotal * taxRate);
+        order_details.should.lengthOf(2);
+        order_details[0].product.should.equal(burger);
+        order_details[0].quantity.should.equal(0);
+        order_details[0].total_price.should.equal(burger.unit_price * 0);
+        order_details[1].product.should.equal(coke);
+        order_details[1].quantity.should.equal(1);
+        order_details[1].total_price.should.equal(coke.unit_price);
+      });
+  });
+
   it('should get the current bill of user', () => {
     const userOrder = shoppingCartSevice.forUser(senderId);
     const burger = productRepository.getBurgerByName('Big Mac');
@@ -247,165 +274,266 @@ describe.only('Shopping Cart Service', () => {
       );
   });
 
-  it('should remove an order', () => {
-    const userOrder = shoppingCartSevice.forUser(senderId);
-    return orderRepository
-      .insert({
-        "order_id": Math.floor(Math.random() * 100000000),
-        "payment_type": "Cash",
-        "currency": "VND",
-        "subtotal": 0,
-        "shipping_cost": 0,
-        "total_cost": 0,
-        "total_tax": 0,
-        "checkouted": false,
-        "checkoutTime": null,
-        "order_user": exampleBill.order_user,
-        "order_details": [],
-        "shipping_address": null
-      })
-      .then(expectedOrder =>
-        // to check if order is existed
-        orderRepository.getById(expectedOrder.id)
-          .should.eventually.to.be.eql(expectedOrder))
-      .then(expectedOrder =>
-        userOrder
-          .removeCurrentOrder()
-          .then(() =>
-            orderRepository
-              .findAllWith(o => o.order_user.facebook_id === senderId && !o.checkouted)
-              .should.eventually.to.lengthOf(0)
-          ));
-  });
+  describe('Remove', () => {
 
-  it('should remove an item in order if there is only one', () => {
-    const userOrder = shoppingCartSevice.forUser(senderId);
-    const burger = productRepository.getBurgerByName('Big Mac');
-    return orderRepository
-      .insert({
-        "order_id": Math.floor(Math.random() * 100000000),
-        "payment_type": "Cash",
-        "currency": "VND",
-        "subtotal": 65000,
-        "shipping_cost": 0,
-        "total_cost": 65000,
-        "total_tax": 6500,
-        "checkouted": false,
-        "checkoutTime": null,
-        "order_user": exampleBill.order_user,
-        "order_details": [{
-          quantity: 1,
-          total_price: 65000,
-          product: burger
-        }],
-        "shipping_address": null
-      })
-      .then(() => userOrder.removeItem(burger))
-      .then(() =>
-        orderRepository
-          .getUncheckedoutOrder(senderId)
-          .then(order => {
-            const order_details = order.order_details;
-            order.subtotal.should.equal(0);
-            order.total_cost.should.equal(0);
-            order.total_tax.should.equal(0);
-            order_details.should.lengthOf(0);
-          }))
-  });
+    it('should remove an order', () => {
+      const userOrder = shoppingCartSevice.forUser(senderId);
+      return orderRepository
+        .insert({
+          "order_id": Math.floor(Math.random() * 100000000),
+          "payment_type": "Cash",
+          "currency": "VND",
+          "subtotal": 0,
+          "shipping_cost": 0,
+          "total_cost": 0,
+          "total_tax": 0,
+          "checkouted": false,
+          "checkoutTime": null,
+          "order_user": exampleBill.order_user,
+          "order_details": [],
+          "shipping_address": null
+        })
+        .then(expectedOrder =>
+          // to check if order is existed
+          orderRepository.getById(expectedOrder.id)
+            .should.eventually.to.be.eql(expectedOrder))
+        .then(expectedOrder =>
+          userOrder
+            .removeCurrentOrder()
+            .then(() =>
+              orderRepository
+                .findAllWith(o => o.order_user.facebook_id === senderId && !o.checkouted)
+                .should.eventually.to.lengthOf(0)
+            ));
+    });
 
-  it('should remove an item in order if there are two items', () => {
-    const userOrder = shoppingCartSevice.forUser(senderId);
-    const burger = productRepository.getBurgerByName('Big Mac');
-    const coke = productRepository.getDrinkByName('Coca-Cola');
-    return orderRepository
-      .insert({
-        "order_id": Math.floor(Math.random() * 100000000),
-        "payment_type": "Cash",
-        "currency": "VND",
-        "subtotal": 85000,
-        "shipping_cost": 0,
-        "total_cost": 85000,
-        "total_tax": 8500,
-        "checkouted": false,
-        "checkoutTime": null,
-        "order_user": exampleBill.order_user,
-        "order_details": [{
-          quantity: 1,
-          total_price: 65000,
-          product: burger
-        }, {
-          "quantity": 1,
-          "total_price": 20000,
-          product: coke
-        }],
-        "shipping_address": null
-      })
-      .then(() => userOrder.removeItem(burger))
-      .then(() =>
-        orderRepository
-          .getUncheckedoutOrder(senderId)
-          .then(order => {
-            const order_details = order.order_details;
-            const subtotal = coke.unit_price;
-            const shippingCost = 0;
-            const taxRate = 0.1;
-            order.subtotal.should.equal(subtotal);
-            order.total_cost.should.equal(subtotal + shippingCost);
-            order.total_tax.should.equal((subtotal + shippingCost) * taxRate);
-            order_details.should.lengthOf(1);
-            order_details[0].product.should.equal(coke);
-            order_details[0].quantity.should.equal(1);
-            order_details[0].total_price.should.equal(coke.unit_price);
-          }));
-  });
+    it('should remove an item in order if there is only one', () => {
+      const userOrder = shoppingCartSevice.forUser(senderId);
+      const burger = productRepository.getBurgerByName('Big Mac');
+      return orderRepository
+        .insert({
+          "order_id": Math.floor(Math.random() * 100000000),
+          "payment_type": "Cash",
+          "currency": "VND",
+          "subtotal": 65000,
+          "shipping_cost": 0,
+          "total_cost": 65000,
+          "total_tax": 6500,
+          "checkouted": false,
+          "checkoutTime": null,
+          "order_user": exampleBill.order_user,
+          "order_details": [{
+            quantity: 1,
+            total_price: 65000,
+            product: burger
+          }],
+          "shipping_address": null
+        })
+        .then(() => userOrder.removeItem(burger))
+        .then(() =>
+          orderRepository
+            .getUncheckedoutOrder(senderId)
+            .then(order => {
+              const order_details = order.order_details;
+              order.subtotal.should.equal(0);
+              order.total_cost.should.equal(0);
+              order.total_tax.should.equal(0);
+              order_details.should.lengthOf(0);
+            }))
+    });
 
-  it.only('should decease one quantity of an item in order', () => {
-    const userOrder = shoppingCartSevice.forUser(senderId);
-    const burger = productRepository.getBurgerByName('Big Mac');
-    const coke = productRepository.getDrinkByName('Coca-Cola');
-    return orderRepository
-      .insert({
-        "order_id": Math.floor(Math.random() * 100000000),
-        "payment_type": "Cash",
-        "currency": "VND",
-        "subtotal": 215000,
-        "shipping_cost": 0,
-        "total_cost": 215000,
-        "total_tax": 21500,
-        "checkouted": false,
-        "checkoutTime": null,
-        "order_user": exampleBill.order_user,
-        "order_details": [{
-          quantity: 3,
-          total_price: 65000,
-          product: burger
-        }, {
-          "quantity": 1,
-          "total_price": 20000,
-          product: coke
-        }],
-        "shipping_address": null
-      })
-      .then(() => userOrder.deceaseQuantityOfItem(burger, 2))
-      .then(() =>
-        orderRepository
-          .getUncheckedoutOrder(senderId)
-          .then(order => {
-            const order_details = order.order_details;
-            const subtotal = burger.unit_price + coke.unit_price;
-            const shippingCost = 0;
-            const taxRate = 0.1;
-            order.subtotal.should.equal(subtotal);
-            order.total_cost.should.equal(subtotal + shippingCost);
-            order.total_tax.should.equal((subtotal + shippingCost) * taxRate);
-            order_details.should.lengthOf(2);
-            order_details[0].product.should.equal(burger);
-            order_details[0].quantity.should.equal(1);
-            order_details[0].total_price.should.equal(burger.unit_price);
-            order_details[1].product.should.equal(coke);
-            order_details[1].quantity.should.equal(1);
-            order_details[1].total_price.should.equal(coke.unit_price);
-          }));
+    it('should remove an item in order if there are two items', () => {
+      const userOrder = shoppingCartSevice.forUser(senderId);
+      const burger = productRepository.getBurgerByName('Big Mac');
+      const coke = productRepository.getDrinkByName('Coca-Cola');
+      return orderRepository
+        .insert({
+          "order_id": Math.floor(Math.random() * 100000000),
+          "payment_type": "Cash",
+          "currency": "VND",
+          "subtotal": 85000,
+          "shipping_cost": 0,
+          "total_cost": 85000,
+          "total_tax": 8500,
+          "checkouted": false,
+          "checkoutTime": null,
+          "order_user": exampleBill.order_user,
+          "order_details": [{
+            quantity: 1,
+            total_price: 65000,
+            product: burger
+          }, {
+            "quantity": 1,
+            "total_price": 20000,
+            product: coke
+          }],
+          "shipping_address": null
+        })
+        .then(() => userOrder.removeItem(burger))
+        .then(() =>
+          orderRepository
+            .getUncheckedoutOrder(senderId)
+            .then(order => {
+              const order_details = order.order_details;
+              const subtotal = coke.unit_price;
+              const shippingCost = 0;
+              const taxRate = 0.1;
+              order.subtotal.should.equal(subtotal);
+              order.total_cost.should.equal(subtotal + shippingCost);
+              order.total_tax.should.equal((subtotal + shippingCost) * taxRate);
+              order_details.should.lengthOf(1);
+              order_details[0].product.should.equal(coke);
+              order_details[0].quantity.should.equal(1);
+              order_details[0].total_price.should.equal(coke.unit_price);
+            }));
+    });
+
+    it('should decease one quantity of an item in order', () => {
+      const userOrder = shoppingCartSevice.forUser(senderId);
+      const burger = productRepository.getBurgerByName('Big Mac');
+      const coke = productRepository.getDrinkByName('Coca-Cola');
+      return orderRepository
+        .insert({
+          "order_id": Math.floor(Math.random() * 100000000),
+          "payment_type": "Cash",
+          "currency": "VND",
+          "subtotal": 215000,
+          "shipping_cost": 0,
+          "total_cost": 215000,
+          "total_tax": 21500,
+          "checkouted": false,
+          "checkoutTime": null,
+          "order_user": exampleBill.order_user,
+          "order_details": [{
+            quantity: 3,
+            total_price: 65000,
+            product: burger
+          }, {
+            "quantity": 1,
+            "total_price": 20000,
+            product: coke
+          }],
+          "shipping_address": null
+        })
+        .then(() => userOrder.deceaseQuantityOfItem(burger))
+        .then(() =>
+          orderRepository
+            .getUncheckedoutOrder(senderId)
+            .then(order => {
+              const order_details = order.order_details;
+              const subtotal = burger.unit_price * 2 + coke.unit_price;
+              const shippingCost = 0;
+              const taxRate = 0.1;
+              order.subtotal.should.equal(subtotal);
+              order.total_cost.should.equal(subtotal + shippingCost);
+              order.total_tax.should.equal((subtotal + shippingCost) * taxRate);
+              order_details.should.lengthOf(2);
+              order_details[0].product.should.equal(burger);
+              order_details[0].quantity.should.equal(2);
+              order_details[0].total_price.should.equal(burger.unit_price * 2);
+              order_details[1].product.should.equal(coke);
+              order_details[1].quantity.should.equal(1);
+              order_details[1].total_price.should.equal(coke.unit_price);
+            }));
+    });
+
+    it('should decease two quantity of an item in order', () => {
+      const userOrder = shoppingCartSevice.forUser(senderId);
+      const burger = productRepository.getBurgerByName('Big Mac');
+      const coke = productRepository.getDrinkByName('Coca-Cola');
+      return orderRepository
+        .insert({
+          "order_id": Math.floor(Math.random() * 100000000),
+          "payment_type": "Cash",
+          "currency": "VND",
+          "subtotal": 215000,
+          "shipping_cost": 0,
+          "total_cost": 215000,
+          "total_tax": 21500,
+          "checkouted": false,
+          "checkoutTime": null,
+          "order_user": exampleBill.order_user,
+          "order_details": [{
+            quantity: 3,
+            total_price: 65000,
+            product: burger
+          }, {
+            "quantity": 1,
+            "total_price": 20000,
+            product: coke
+          }],
+          "shipping_address": null
+        })
+        .then(() => userOrder.deceaseQuantityOfItem(burger, 2))
+        .then(() =>
+          orderRepository
+            .getUncheckedoutOrder(senderId)
+            .then(order => {
+              const order_details = order.order_details;
+              const subtotal = burger.unit_price + coke.unit_price;
+              const shippingCost = 0;
+              const taxRate = 0.1;
+              order.subtotal.should.equal(subtotal);
+              order.total_cost.should.equal(subtotal + shippingCost);
+              order.total_tax.should.equal((subtotal + shippingCost) * taxRate);
+              order_details.should.lengthOf(2);
+              order_details[0].product.should.equal(burger);
+              order_details[0].quantity.should.equal(1);
+              order_details[0].total_price.should.equal(burger.unit_price);
+              order_details[1].product.should.equal(coke);
+              order_details[1].quantity.should.equal(1);
+              order_details[1].total_price.should.equal(coke.unit_price);
+            }));
+    });
+
+    it('should decease none if input quantity is less than 0', () => {
+      const userOrder = shoppingCartSevice.forUser(senderId);
+      const burger = productRepository.getBurgerByName('Big Mac');
+      const coke = productRepository.getDrinkByName('Coca-Cola');
+      return orderRepository
+        .insert({
+          "order_id": Math.floor(Math.random() * 100000000),
+          "payment_type": "Cash",
+          "currency": "VND",
+          "subtotal": 215000,
+          "shipping_cost": 0,
+          "total_cost": 215000,
+          "total_tax": 21500,
+          "checkouted": false,
+          "checkoutTime": null,
+          "order_user": exampleBill.order_user,
+          "order_details": [{
+            quantity: 3,
+            total_price: 65000,
+            product: burger
+          }, {
+            "quantity": 1,
+            "total_price": 20000,
+            product: coke
+          }],
+          "shipping_address": null
+        })
+        .then(() => userOrder.deceaseQuantityOfItem(burger, 0))
+        .then(() =>
+          orderRepository
+            .getUncheckedoutOrder(senderId)
+            .then(order => {
+              const order_details = order.order_details;
+              const subtotal = burger.unit_price * 3 + coke.unit_price;
+              const shippingCost = 0;
+              const taxRate = 0.1;
+              order.subtotal.should.equal(subtotal);
+              order.total_cost.should.equal(subtotal + shippingCost);
+              order.total_tax.should.equal((subtotal + shippingCost) * taxRate);
+              order_details.should.lengthOf(2);
+              order_details[0].product.should.equal(burger);
+              order_details[0].quantity.should.equal(3);
+              order_details[0].total_price.should.equal(burger.unit_price * 3);
+              order_details[1].product.should.equal(coke);
+              order_details[1].quantity.should.equal(1);
+              order_details[1].total_price.should.equal(coke.unit_price);
+            }));
+    });
   });
 
   it('should add a payment type', () => {
@@ -418,9 +546,32 @@ describe.only('Shopping Cart Service', () => {
       .should.eventually.to.equal(newPaymentType);
   });
 
-  it.skip('should add a shipping address', () => {
+  it.only('should add a shipping address', () => {
+
   });
 
-  it.skip('should get the recript', () => {
+  it('should get the recript', () => {
+    const userOrder = shoppingCartSevice.forUser(senderId);
+    const burger = productRepository.getBurgerByName('Big Mac');
+    const coke = productRepository.getDrinkByName('Coca-Cola');
+    return userOrder
+      .createOrderIfnotExisted()
+      .then(() => userOrder.addItem(burger))
+      .then(() => userOrder.addItem(burger))
+      .then(() => userOrder.addItem(coke))
+      .then(() => userOrder.checkout())
+      .then(checkoutedOrder => Promise.all([
+        Promise.resolve(checkoutedOrder),
+        orderRepository.getById(checkoutedOrder.id),
+      ]))
+      .then(result => {
+        const actualOrder = result[0];
+        const expectedOrder = result[1];
+        actualOrder.should.be.eql(expectedOrder);
+        actualOrder.checkoutTime.should.to.be.a('string');
+        actualOrder.checkouted.should.to.be.true;
+        expectedOrder.checkouted.should.to.be.true;
+        expectedOrder.checkoutTime.should.to.be.a('string');
+      });
   });
 });
