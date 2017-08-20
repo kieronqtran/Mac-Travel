@@ -3,7 +3,7 @@ const database = require('../db');
 const productTable = database.get('products');
 
 /**
- * Product: {      
+ * Product: {
       "id": Number - Product Id,
       "name": String - Product Name,
       "type": String - Product Type (only Burger or Drink),

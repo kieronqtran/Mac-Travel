@@ -175,6 +175,19 @@ function deceaseQuantityOfItem(senderId, item, quantity) {
     })
 }
 
+function getShippingAddress(senderId) {
+  return getCurrentOrder(senderId)
+    .then(order => order.shipping_address);
+}
+
+function setShippingAddress(senderId, shipping_address) {
+  return getCurrentOrder(senderId)
+    .then(order => {
+      order.shipping_address = shipping_address;
+      return orderRepository.update(order);
+    });
+}
+
 const shoppingCartService = {
   addItem,
   changePaymentType,
@@ -187,11 +200,13 @@ const shoppingCartService = {
   removeItem,
   getCurrentOrder,
   setQuantityOfItem,
+  setShippingAddress,
+  getShippingAddress,
 };
 
 /**
  * Reduce the senderId arguments in every function
- * @param {String} senderId - facebook user Id 
+ * @param {String} senderId - facebook user Id
  * @return {Object} Reduced senderId arguement of shoppingCartService object
  */
 function forUser(senderId) {

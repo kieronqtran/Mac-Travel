@@ -140,7 +140,7 @@ function addABurgerToFile() {
     type: 'Burger',
     item_url: 'https://www.mcdonalds.com/us/en-us/product/big-mac.html',
     image_url:
-      'https://www.mcdonalds.com/content/dam/usa/promotions/mobile/extravaluemeal-mobile.jpg',
+    'https://www.mcdonalds.com/content/dam/usa/promotions/mobile/extravaluemeal-mobile.jpg',
     unit_price: 65000,
     concurrency: 'VND',
     description: 'The one and only.',

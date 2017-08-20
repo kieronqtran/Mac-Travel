@@ -546,7 +546,110 @@ describe.only('Shopping Cart Service', () => {
       .should.eventually.to.equal(newPaymentType);
   });
 
-  it.only('should add a shipping address', () => {
+  describe('Shipping Address', () => {
+
+    it('should add a shipping address to bill', () => {
+      const userOrder = shoppingCartSevice.forUser(senderId);
+      const burger = productRepository.getBurgerByName('Big Mac');
+      const coke = productRepository.getDrinkByName('Coca-Cola');
+      return orderRepository
+        .insert({
+          "order_id": Math.floor(Math.random() * 100000000),
+          "payment_type": "Cash",
+          "currency": "VND",
+          "subtotal": 215000,
+          "shipping_cost": 0,
+          "total_cost": 215000,
+          "total_tax": 21500,
+          "checkouted": false,
+          "checkoutTime": null,
+          "order_user": exampleBill.order_user,
+          "order_details": [{
+            "quantity": 3,
+            "total_price": 65000,
+            "product": burger
+          }, {
+            "quantity": 1,
+            "total_price": 20000,
+            "product": coke
+          }],
+          "shipping_address": null
+        })
+        .then(() => userOrder.setShippingAddress(exampleBill.shipping_address))
+        .then(() =>
+          orderRepository
+            .getUncheckedoutOrder(senderId)
+            .then(order => {
+              order.shipping_address.should.equal(exampleBill.shipping_address);
+            }))
+    });
+
+    it('should get a shipping address from bill', () => {
+      const userOrder = shoppingCartSevice.forUser(senderId);
+      const burger = productRepository.getBurgerByName('Big Mac');
+      const coke = productRepository.getDrinkByName('Coca-Cola');
+      return orderRepository
+        .insert({
+          "order_id": Math.floor(Math.random() * 100000000),
+          "payment_type": "Cash",
+          "currency": "VND",
+          "subtotal": 215000,
+          "shipping_cost": 0,
+          "total_cost": 215000,
+          "total_tax": 21500,
+          "checkouted": false,
+          "checkoutTime": null,
+          "order_user": exampleBill.order_user,
+          "order_details": [{
+            "quantity": 3,
+            "total_price": 65000,
+            "product": burger
+          }, {
+            "quantity": 1,
+            "total_price": 20000,
+            "product": coke
+          }],
+          "shipping_address": exampleBill.shipping_address
+        })
+        .then(() => userOrder.getShippingAddress())
+        .then(shipping_address => shipping_address.should.equal(exampleBill.shipping_address));
+    });
+
+    it.only('should add a shipping address to bill', () => {
+      const userOrder = shoppingCartSevice.forUser(senderId);
+      const burger = productRepository.getBurgerByName('Big Mac');
+      const coke = productRepository.getDrinkByName('Coca-Cola');
+      return orderRepository
+        .insert({
+          "order_id": Math.floor(Math.random() * 100000000),
+          "payment_type": "Cash",
+          "currency": "VND",
+          "subtotal": 215000,
+          "shipping_cost": 0,
+          "total_cost": 215000,
+          "total_tax": 21500,
+          "checkouted": false,
+          "checkoutTime": null,
+          "order_user": exampleBill.order_user,
+          "order_details": [{
+            "quantity": 3,
+            "total_price": 65000,
+            "product": burger
+          }, {
+            "quantity": 1,
+            "total_price": 20000,
+            "product": coke
+          }],
+          "shipping_address": null
+        })
+        .then(() => userOrder.setShippingAddress(exampleBill.shipping_address))
+        .then(() =>
+          orderRepository
+            .getUncheckedoutOrder(senderId)
+            .then(order => {
+              order.shipping_address.should.equal(exampleBill.shipping_address);
+            }))
+    });
 
   });
 
