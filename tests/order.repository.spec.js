@@ -139,9 +139,9 @@ describe('Orders Repository', () => {
   it('should remove an order', done => {
     let expectedOrder = Object.assign({}, exampleOrder);
     delete expectedOrder.id;
-    db
+    Promise.resolve(db
       .upsert(expectedOrder)
-      .write()
+      .write())
       .then(order => {
         orderRepository.remove(order);
         return order;

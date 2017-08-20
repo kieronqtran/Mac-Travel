@@ -10,7 +10,15 @@ const defaultConstraint = {
   currency: "VND",
 }
 
-function addPaymentType(senderId, paymentType) { };
+function changePaymentType(senderId, paymentType) {
+  return createOrderIfnotExisted(senderId)
+    .then(() => orderRepository.getUncheckedoutOrder(senderId))
+    .then(order => {
+      order.payment_type = paymentType;
+      return order;
+    })
+    .then(order => orderRepository.update(order));
+};
 
 function checkout(senderId) {
   return {
@@ -78,7 +86,6 @@ function checkout(senderId) {
   };
 };
 
-
 function createOrderIfnotExisted(senderId) {
   return userRepository
     .getUserByFacebookId(senderId)
@@ -124,7 +131,7 @@ function addItem(senderId, item) {
         order.total_tax = order.total_cost * defaultConstraint.taxRate;
         order.order_details.push.call(order.order_details, order_detail);
       } else {
-        let order_detail = _.find(order.order_details, od => od.product.id === item.id);
+        const order_detail = _.find(order.order_details, od => od.product.id === item.id);
         order_detail.quantity = order_detail.quantity + 1;
         order_detail.total_price = order_detail.product.unit_price * order_detail.quantity;
         const item_index = _.findIndex(order.order_details, od => od.product.id === item.id);
@@ -141,14 +148,82 @@ function getCurrentOrder(senderId) {
   return orderRepository.getUncheckedoutOrder(senderId);
 }
 
+function setQuantityOfItem(senderId, item, quantity) {
+  return orderRepository
+    .getUncheckedoutOrder(senderId)
+    .then(order => {
+      if (order.order_details.length === 0 ||
+        !order.order_details.find(od => od.product.id === item.id)) {
+        return addItem(item);
+      }
+      return order;
+    })
+    .then(order => {
+      const order_detail = _.find(order.order_details, od => od.product.id === item.id);
+      order_detail.quantity = quantity;
+      order_detail.total_price = order_detail.product.unit_price * order_detail.quantity;
+      const item_index = _.findIndex(order.order_details, od => od.product.id === item.id);
+      order.order_details[item_index] = order_detail;
+      order.subtotal = order.order_details
+        .reduce((previous, current) => previous + current.total_price, 0);
+      order.total_cost = order.subtotal + order.shipping_cost;
+      order.total_tax = order.total_cost * defaultConstraint.taxRate;
+      return orderRepository.update(order);
+    });
+}
+
+function removeCurrentOrder(senderId) {
+  return getCurrentOrder(senderId)
+    .then(order => orderRepository.remove(order));
+}
+
+function removeItem(senderId, item) {
+  return getCurrentOrder(senderId)
+    .then(order => {
+      if (order.order_details.length > 0) {
+        _.remove(order.order_details, o => o.product.id === item.id);
+        if (order.order_details.length === 0) {
+          order.subtotal = 0;
+          order.total_cost = 0;
+          order.total_tax = 0;
+        } else {
+          order.subtotal = order.order_details
+            .reduce((previous, current) => previous + current.total_price, 0);
+          order.total_cost = order.subtotal + order.shipping_cost;
+          order.total_tax = order.total_cost * defaultConstraint.taxRate;
+        }
+      }
+      return orderRepository.update(order);
+    });
+}
+
+function deceaseQuantityOfItem(senderId, item, quantity) {
+  return getCurrentOrder(senderId)
+    .then(order => {
+      const itemOfOrderDetail = _.find(order.order_details, od => od.product.id === item.id);
+      if (order.order_details.length !== 0 ||
+        !itemOfOrderDetail) {
+        const defaultQuantity = !quantity ? 1 :
+          quantity < 1 ? 0 :
+            itemOfOrderDetail.quantity - quantity;
+        return setQuantityOfItem(senderId, item, defaultQuantity);
+      }
+      return orderRepository.update(order);
+    })
+}
+
 const shoppingCartService = {
   addItem,
-  addPaymentType,
+  changePaymentType,
   checkout,
   createOrderIfnotExisted,
+  deceaseQuantityOfItem,
   forUser,
   hasItemInShoppingCart,
+  removeCurrentOrder,
+  removeItem,
   getCurrentOrder,
+  setQuantityOfItem,
 };
 
 /**

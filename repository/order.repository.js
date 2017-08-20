@@ -35,7 +35,7 @@ exports.update = function (order) {
 
 exports.remove = function (orderOrId) {
   return Number.isInteger(orderOrId)
-    ? db.removeById(orderOrId).write()
-    : db.removeById(orderOrId.id).write();
+    ? Promise.resolve(db.removeById(orderOrId).write())
+    : Promise.resolve(db.removeById(orderOrId.id).write());
 };
 
