@@ -27,6 +27,13 @@
         "NODE_ENV": "test"
       },
       "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach by Process ID",
+      "protocol": "inspector",
+      "processId": "${command:PickProcess}"
     }
   ]
 }

@@ -466,11 +466,11 @@ function confirmingOrder(recipientId, product) {
           buttons: [{
             type: "postback",
             title: "Yes",
-            payload: "CONFIRM_" + productname
+            payload: "CONFIRM_" + product.payload_name
           }, {
             type: "postback",
             title: "No",
-            payload: "DECLINE"
+            payload: "DECLINE_" + product.payload_name
           }]
         }
       }
@@ -483,6 +483,7 @@ function confirmingOrder(recipientId, product) {
 function processPostback(event) {
   const senderId = event.sender.id;
   const payload = event.postback.payload;
+  const userOrder = shoppingCartSevice.forUser(senderId);
   if (payload === "Greeting") { // ?? When this payload is called?
     userRepository.getUserByFacebookId(senderId)
       .then(user => `Hi ${user.gender === 'male' ? 'Mr.' : 'Ms.'} ${user.last_name} .Welcome to MACTravel for the first time.`)
@@ -493,8 +494,7 @@ function processPostback(event) {
   } else if (payload === "DRINK_MENU") {
     sendMessage(senderId, { text: "Select your options:" });
     sendDrinkMenu(senderId);
-  } else if (productRepository
-    .getAllPayLoads()
+  } else if (productRepository.getAllPayLoads()
     .some(p => p === payload)) { // will check if the payload is matching any payloads in the db
     const item = productRepository.getItemByPayload(payload);
     confirmingOrder(senderId, item);
@@ -503,31 +503,24 @@ function processPostback(event) {
     const item = productRepository.getItemByPayload(extractedPayload);
     sendMessage(senderId, {
       text:
-      `Type 'menu' to continue to your order\n
-       Type 'show order' to see what you have ordered \n
-       Type 'checkout' to finish your order.` });
+      `Type 'menu' to continue to your order.\nType 'show order' to see what you have ordered.\nType 'checkout' to finish your order.`
+    });
   } else if (/CONFIRM_/.test(payload)) {
     const extractedPayload = payload.split('CONFIRM_')[1];
     const item = productRepository.getItemByPayload(extractedPayload);
-    shoppingCartSevice
-      .forUser(senderId)
-      .addItem(item)
+    userOrder.addItem(item)
       // The sending messages should guide users what to do next.
       .then(() => sendMessage(senderId,
         {
-          text: `Adding ${item.name} is successful.
-        Type 'menu' to continue to your order
-        Type 'show order' to see what you have ordered
-        Type 'checkout' to finish your order.` }));
+          text: `Adding ${item.name} is successful.\nType 'menu' to continue to your order.\nType 'show order' to see what you have ordered.\nType 'checkout' to finish your order.`
+        }));
   } else if (/DECLINE_/.test(payload)) {
     const extractedPayload = payload.split('DECLINE_')[1];
     const item = productRepository.getItemByPayload(extractedPayload);
     sendMessage(senderId,
       {
-        text: `${item.name} has declined.
-      Type 'menu' to continue to your order
-      Type 'show order' to see what you have ordered
-      Type 'checkout' to finish your order.` });
+        text: `${item.name} has declined.\nType 'menu' to continue to your order.\nType 'show order' to see what you have ordered.\nType 'checkout' to finish your order.`
+      });
   }
 }
 
@@ -556,8 +549,8 @@ function sendMessage(recipientId, message) {
 
 
 function sendReceiptMessage(recipientId) {
-  return shoppingcartService
-    .forUser(recipientId)
+  const userOrder = shoppingcartService.forUser(recipientId);
+  return userOrder
     .checkout()
     .then(bill => {
       const messageData = {
