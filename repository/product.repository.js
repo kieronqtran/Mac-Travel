@@ -39,6 +39,13 @@ exports.getAllProducts = function () {
   return productTable.value();
 };
 
+/**
+  * return <Product>[] list of payload name
+  */
+exports.getAllPayLoads = function () {
+  return productTable.value().map(p => p.payload_name);
+};
+
 exports.findProductById = function (id) {
   return productTable.find({ id: id }).value();
 };
@@ -68,6 +75,11 @@ exports.getProductByName = function (name) {
 
 exports.getBurgerByName = function (name) {
   const product = productTable.find({ name: name, type: 'Burger' }).value();
+  return product;
+};
+
+exports.getItemByPayload = function (payload) {
+  const product = productTable.find(p => p.payload_name === payload).value();
   return product;
 };
 

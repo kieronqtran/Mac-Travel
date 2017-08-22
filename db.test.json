@@ -1,12 +1,12 @@
 {
   "users": [
     {
-      "id": 1,
       "facebook_id": "2042621042422137",
       "first_name": "Quang",
       "last_name": "Tran",
       "gender": "male",
-      "timezone": 7
+      "timezone": 7,
+      "id": 1
     }
   ],
   "products": [
@@ -62,6 +62,7 @@
       "unit_price": 20000,
       "currency": "VND",
       "description": "The burger's companion.",
+      "payload_name": "COCA_COLA",
       "id": 5
     },
     {
@@ -99,8 +100,8 @@
       "total_tax": 8700,
       "checkouted": true,
       "checkoutTime": "1503154662671",
-      "updatedTime": "1503154662671",
-      "createdTime": "1503154662671",
+      "updatedTime": 1503154662671,
+      "createdTime": 1503154662671,
       "order_user": {
         "id": 1,
         "facebook_id": "2042621042422137",

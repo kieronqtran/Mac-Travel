@@ -58,6 +58,7 @@ function hasItemInShoppingCart(senderId) {
     .then(order => order.order_details.length > 0);
 }
 
+//TODO: implement quantity
 function addItem(senderId, item) {
   return createOrderIfnotExisted(senderId)
     .then(() => orderRepository.getUncheckedoutOrder(senderId))
@@ -114,7 +115,7 @@ function setQuantityOfItem(senderId, item, quantity) {
         order.total_tax = order.total_cost * defaultConstraint.taxRate;
         return orderRepository.update(order);
       }
-      // Need refactor to smaller code size
+      //TODO: Need refactor to smaller code size
       const order_detail = _.find(order.order_details, od => od.product.id === item.id);
       order_detail.quantity = 0;
       order_detail.total_price = order_detail.product.unit_price * order_detail.quantity;
@@ -158,7 +159,7 @@ function deceaseQuantityOfItem(senderId, item, quantity) {
     .then(order => {
       const itemOfOrderDetail = _.find(order.order_details, od => od.product.id === item.id);
       if (order.order_details.length !== 0 ||
-        !itemOfOrderDetail) {
+        !!!itemOfOrderDetail) {
         let defaultQuantity = 0;
         if (typeof quantity === 'undefined') {
           defaultQuantity = itemOfOrderDetail.quantity - 1;

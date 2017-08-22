@@ -35,7 +35,7 @@ app.get('/db', function (req, res) {
       if (err) {
         return console.error(err);
       }
-      res.send(data);
+      res.send(`<pre>${data}</pre>`);
     });
 });
 

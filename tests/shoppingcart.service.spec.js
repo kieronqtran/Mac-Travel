@@ -486,7 +486,7 @@ describe.only('Shopping Cart Service', () => {
             }));
     });
 
-    it('should decease none if input quantity is less than 0', () => {
+    it.only('should decease none if input quantity is less than 0', () => {
       const userOrder = shoppingCartSevice.forUser(senderId);
       const burger = productRepository.getBurgerByName('Big Mac');
       const coke = productRepository.getDrinkByName('Coca-Cola');
@@ -513,7 +513,9 @@ describe.only('Shopping Cart Service', () => {
           }],
           "shipping_address": null
         })
-        .then(() => userOrder.deceaseQuantityOfItem(burger, 0))
+        .then(order => {
+          userOrder.deceaseQuantityOfItem(burger, 0)
+        })
         .then(() =>
           orderRepository
             .getUncheckedoutOrder(senderId)
@@ -533,6 +535,7 @@ describe.only('Shopping Cart Service', () => {
               order_details[1].quantity.should.equal(1);
               order_details[1].total_price.should.equal(coke.unit_price);
             }));
+
     });
   });
 
@@ -615,7 +618,7 @@ describe.only('Shopping Cart Service', () => {
         .then(shipping_address => shipping_address.should.equal(exampleBill.shipping_address));
     });
 
-    it.only('should add a shipping address to bill', () => {
+    it('should add a shipping address to bill', () => {
       const userOrder = shoppingCartSevice.forUser(senderId);
       const burger = productRepository.getBurgerByName('Big Mac');
       const coke = productRepository.getDrinkByName('Coca-Cola');
@@ -677,4 +680,15 @@ describe.only('Shopping Cart Service', () => {
         expectedOrder.checkoutTime.should.to.be.a('string');
       });
   });
+
+  it('', () => {
+    const date = Date.now();
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const totalTime = Date.now() - date;
+        console.log(totalTime);
+        resolve();
+      }, 500);
+    });
+  })
 });
