@@ -495,7 +495,7 @@ function processPostback(event) {
     sendDrinkMenu(senderId);
   } else if (productRepository
     .getAllPayLoads()
-    .some(p => p.payload_name === payload)) { // will check if the payload is matching any payloads in the db
+    .some(p => p === payload)) { // will check if the payload is matching any payloads in the db
     const item = productRepository.getItemByPayload(payload);
     confirmingOrder(senderId, item);
   } else if (/EXIT_/.test(payload)) {
