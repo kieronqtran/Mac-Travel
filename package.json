@@ -5,8 +5,8 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "mocha --recursive --reporter spec --ui bdd -w **/*.js --require './tests/util/setup.js' ./tests/**/*.spec.js"
+    "start": "node index.refactored.js",
+    "test": "NODE_ENV='test' mocha --inspect --recursive --reporter spec --ui bdd --require './tests/util/setup.js' ./tests/**/*.spec.js"
   },
   "repository": {
     "type": "git",

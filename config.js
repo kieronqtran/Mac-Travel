@@ -16,3 +16,8 @@ exports.PAGE_ACCESS_TOKEN = process.env.FB_ACCESS_TOKEN;
 exports.SERVER_URL = process.env.SERVER_URL;
 
 exports.DATABASE_LOCATION = process.env.DATABASE_LOCATION || 'db.json';
+
+exports.environments = {
+  production: process.env.NODE_ENV === 'production',
+  test: process.env.NODE_ENV === 'test'
+}
