@@ -5,7 +5,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "node index.refactored.js",
+    "start": "node index.js",
     "test": "NODE_ENV='test' mocha --inspect --recursive --reporter spec --ui bdd --require './tests/util/setup.js' ./tests/**/*.spec.js"
   },
   "repository": {
