@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "NODE_ENV='test' mocha --inspect --recursive --reporter spec --ui bdd --require './tests/util/setup.js' ./tests/**/*.spec.js"
+    "test": "NODE_ENV='test' nyc mocha --recursive --reporter spec --ui bdd --require './tests/util/setup.js' ./tests/**/*.spec.js"
   },
   "repository": {
     "type": "git",
@@ -31,10 +31,20 @@
   },
   "devDependencies": {
     "chai": "3.5.0",
+    "nyc": "^11.1.0",
     "chai-as-promised": "^7.1.1",
     "mocha": "^3.5.0",
     "nodemon": "^1.11.0",
     "sinon": "^3.2.0",
     "sinon-chai": "^2.13.0"
+  },
+  "nyc": {
+    "exclude": [
+      "./**/*.spec.js"
+    ],
+    "reporter": [
+      "lcov",
+      "text-summary"
+    ]
   }
 }

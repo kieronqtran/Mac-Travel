@@ -63,6 +63,7 @@ app.get('/webhook', function (req, res) {
 app.post('/webhook', function (req, res) {
   const data = req.body;
 
+  console.log(JSON.stringify(data, null, 2));
   // Make sure this is a page subscription
   if (data.object === 'page') {
     // Iterate over each entry
@@ -124,7 +125,6 @@ function receivedMessage(event) {
 
   console.log("Received message for user %d and page %d at %d with message:",
     senderID, recipientID, timeOfMessage);
-  console.log(JSON.stringify(message, null, 4));
 
   const messageId = message.mid;
   const appId = message.app_id;
@@ -465,6 +465,10 @@ function confirmingOrder(recipientId, product) {
           text: "Confirmation: if you want " + product.name + " add to your order.",
           buttons: [{
             type: "postback",
+            title: "Review your order",
+            payload: "REVIEW"
+          }, {
+            type: "postback",
             title: "Yes",
             payload: "CONFIRM_" + product.payload_name
           }, {
@@ -494,6 +498,34 @@ function processPostback(event) {
   } else if (payload === "DRINK_MENU") {
     sendMessage(senderId, { text: "Select your options:" });
     sendDrinkMenu(senderId);
+  } else if (payload === "REVIEW") {
+    return userOrder
+      .getCurrentOrder()
+      .then(order => {
+        const elements = order.order_details
+          .map(order_detail => ({
+            "title": order_detail.product.name,
+            "subtitle": order_detail.product.description,
+            "image_url": order_detail.product.image_url,
+          }));
+        const messageData = {
+          recipient: {
+            id: senderId,
+          },
+          message: {
+            attachment: {
+              type: "template",
+              payload: {
+                template_type: "generic",
+                elements: elements
+              }
+            }
+          }
+        };
+
+        console.log(JSON.stringify(messageData, null, 2));
+        return messageData;
+      }).then(messageData => callSendAPI(messageData));
   } else if (productRepository.getAllPayLoads()
     .some(p => p === payload)) { // will check if the payload is matching any payloads in the db
     const item = productRepository.getItemByPayload(payload);
