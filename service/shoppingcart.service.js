@@ -21,7 +21,7 @@ function changePaymentType(senderId, paymentType) {
 };
 
 function checkout(senderId) {
-  return getCurrentOrder(senderId)
+  return orderRepository.getUncheckedoutOrder(senderId)
     .then(order => {
       order.checkouted = true;
       order.checkoutTime = Date.now().toString();
@@ -130,14 +130,15 @@ function setQuantityOfItem(senderId, item, quantity) {
 }
 
 function removeCurrentOrder(senderId) {
-  return getCurrentOrder(senderId)
+  return orderRepository.getUncheckedoutOrder(senderId)
     .then(order => orderRepository.remove(order));
 }
 
 function removeItem(senderId, item) {
-  return getCurrentOrder(senderId)
+  return orderRepository.getUncheckedoutOrder(senderId)
     .then(order => {
-      if (order.order_details.length > 0) {
+      const order_details = order.order_details;
+      if (order_details.length > 0) {
         _.remove(order.order_details, o => o.product.id === item.id);
         if (order.order_details.length === 0) {
           order.subtotal = 0;
@@ -155,11 +156,11 @@ function removeItem(senderId, item) {
 }
 
 function deceaseQuantityOfItem(senderId, item, quantity) {
-  return getCurrentOrder(senderId)
+  return orderRepository.getUncheckedoutOrder(senderId)
     .then(order => {
       const itemOfOrderDetail = _.find(order.order_details, od => od.product.id === item.id);
       if (order.order_details.length !== 0 ||
-        !!!itemOfOrderDetail) {
+        !itemOfOrderDetail) {
         let defaultQuantity = 0;
         if (typeof quantity === 'undefined') {
           defaultQuantity = itemOfOrderDetail.quantity - 1;

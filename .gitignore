@@ -8,3 +8,5 @@ node_modules
 .c9/
 .env
 .idea
+coverage/
+.nyc_output
