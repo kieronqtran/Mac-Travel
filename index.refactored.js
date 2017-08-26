@@ -97,7 +97,7 @@ function checkTime(senderID) {
     .getUserByFacebookId(senderID)
     .then(user => {
       const date = new Date();
-      const hour = date.getHours() + user.timezone;
+      const hour = date.getUTCHours() + user.timezone;
       if (hour < 12)
         return `Good morning, ${user.first_name}`;
       if (hour >= 12 && hour < 18)
@@ -227,7 +227,9 @@ function receivedMessage(event) {
               break top;
 
             case 'checkout':
-            //TODO: implement checkout function here
+              //TODO: implement checkout function here
+              sendCheckoutMessage(senderID);
+              break top;
 
             case 'website':
               sendTextMessage(senderID, "Do you mean our website? If yes, this is it https://www.mcdonalds.com/us/en-us.html");
@@ -490,8 +492,9 @@ function processPostback(event) {
   const userOrder = shoppingCartSevice.forUser(senderId);
   if (payload === "Greeting") { // ?? When this payload is called?
     userRepository.getUserByFacebookId(senderId)
-      .then(user => `Hi ${user.gender === 'male' ? 'Mr.' : 'Ms.'} ${user.last_name} .Welcome to MACTravel for the first time.`)
-      .then(() => sendMessage(senderId, { text: message }));
+      .then(user =>
+        `Hi ${user.gender === 'male' ? 'Mr.' : 'Ms.'}${user.first_name} ${user.last_name}. Welcome to MACTravel for the first time. Type 'menu' to show our menu`)
+      .then(message => sendMessage(senderId, { text: message }));
   } else if (payload === "BURGER_MENU") {
     sendMessage(senderId, { text: "Select your options:" });
     sendBurgerMenu(senderId);
@@ -522,7 +525,6 @@ function processPostback(event) {
             }
           }
         };
-
         console.log(JSON.stringify(messageData, null, 2));
         return messageData;
       }).then(messageData => callSendAPI(messageData));
@@ -580,10 +582,10 @@ function sendMessage(recipientId, message) {
 }
 
 
-function sendReceiptMessage(recipientId) {
-  const userOrder = shoppingcartService.forUser(recipientId);
-  return userOrder
-    .checkout()
+function sendCheckoutMessage(recipientId) {
+  const userOrder = shoppingCartSevice.forUser(recipientId);
+  return shoppingCartSevice
+    .checkout(recipientId)
     .then(bill => {
       const messageData = {
         recipient: {
@@ -594,7 +596,7 @@ function sendReceiptMessage(recipientId) {
             type: 'template',
             payload: {
               template_type: 'receipt',
-              recipient_name: bill.shipping_address.customer_name,
+              recipient_name: `${bill.order_user.first_name} ${bill.order_user.last_name}`,
               order_number: "Order_" + bill.order_id,
               currency: bill.currency,
               payment_method: bill.payment_type,
@@ -607,7 +609,13 @@ function sendReceiptMessage(recipientId) {
                 currency: order_detail.product.currency,
                 image_url: order_detail.product.image_url,
               })),
-              address: null,
+              address: {
+                street_1: "702 Nguyen Van Linh",
+                city: "Ho Chi Minh",
+                postal_code: "700000",
+                state: "HCM",
+                country: "VN"
+              },
               summary: {
                 subtotal: bill.subtotal,
                 shipping_cost: bill.shipping_cost,
@@ -627,6 +635,7 @@ function sendReceiptMessage(recipientId) {
           country: bill.shipping_address.country,
         }
       }
+      return messageData;
     })
     .then(messageData => callSendAPI(messageData));
 }

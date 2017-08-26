@@ -167,8 +167,8 @@
       "shipping_cost": 0,
       "total_cost": 85000,
       "total_tax": 8500,
-      "checkouted": false,
-      "checkoutTime": null,
+      "checkouted": true,
+      "checkoutTime": "1503726223199",
       "order_user": {
         "facebook_id": "1385931291489306",
         "first_name": "Quang",
@@ -211,8 +211,183 @@
       ],
       "shipping_address": null,
       "createdTime": 1503559114989,
-      "updatedTime": 1503562443830,
+      "updatedTime": 1503726224303,
       "id": 2
+    },
+    {
+      "order_id": "62862077",
+      "payment_type": "Cash",
+      "currency": "VND",
+      "subtotal": 55000,
+      "shipping_cost": 0,
+      "total_cost": 55000,
+      "total_tax": 5500,
+      "checkouted": true,
+      "checkoutTime": "1503727930",
+      "order_user": {
+        "facebook_id": "1385931291489306",
+        "first_name": "Quang",
+        "last_name": "Tran",
+        "gender": "male",
+        "timezone": 7,
+        "id": 2
+      },
+      "order_details": [
+        {
+          "quantity": 1,
+          "total_price": 55000,
+          "product": {
+            "name": "Signature Sriracha Burger",
+            "type": "Burger",
+            "item_url": "https://www.mcdonalds.com/us/en-us/product/sriracha-burger-on-artisan-roll.html",
+            "image_url": "http://del.h-cdn.co/assets/17/29/980x490/landscape-1500316280-sriracha-burger.png",
+            "unit_price": 55000,
+            "currency": "VND",
+            "description": "Spicy meets saucy.",
+            "payload_name": "SIGNATURE_SRIRACHA_BURGER",
+            "id": 2
+          }
+        }
+      ],
+      "shipping_address": null,
+      "createdTime": 1503727897870,
+      "updatedTime": 1503727930635,
+      "id": 3
+    },
+    {
+      "order_id": "76939568",
+      "payment_type": "Cash",
+      "currency": "VND",
+      "subtotal": 75000,
+      "shipping_cost": 0,
+      "total_cost": 75000,
+      "total_tax": 7500,
+      "checkouted": true,
+      "checkoutTime": "1503728029",
+      "order_user": {
+        "facebook_id": "1385931291489306",
+        "first_name": "Quang",
+        "last_name": "Tran",
+        "gender": "male",
+        "timezone": 7,
+        "id": 2
+      },
+      "order_details": [
+        {
+          "quantity": 1,
+          "total_price": 55000,
+          "product": {
+            "name": "Sweet BBQ Bacon",
+            "type": "Burger",
+            "item_url": "https://www.mcdonalds.com/us/en-us/product/sweet-bbq-bacon-burger-on-sesame-seed-bun-202504.html",
+            "image_url": "http://static6.businessinsider.com/image/590cea94dd08959c288b4aeb-1207/sweet%20bbq%20mcdonalds%20bacon%20burger.png",
+            "unit_price": 55000,
+            "currency": "VND",
+            "description": "Tangy, Sweet, Juicy",
+            "payload_name": "SWEET_BBQ_BACON",
+            "id": 3
+          }
+        },
+        {
+          "quantity": 1,
+          "total_price": 20000,
+          "product": {
+            "name": "Chocolate Shake",
+            "type": "Drink",
+            "item_url": "https://www.mcdonalds.com/us/en-us/product/chocolate-shake-small.html",
+            "image_url": "http://s.eatthis-cdn.com/media/images/ext/907498607/mcdonalds-menu-dessert-shake-chocolate.jpg",
+            "unit_price": 20000,
+            "currency": "VND",
+            "description": "Chocolaty perfection.",
+            "payload_name": "CHOCOLATE_SHAKE",
+            "id": 4
+          }
+        }
+      ],
+      "shipping_address": null,
+      "createdTime": 1503728012041,
+      "updatedTime": 1503728029991,
+      "id": 4
+    },
+    {
+      "order_id": "17933451",
+      "payment_type": "Cash",
+      "currency": "VND",
+      "subtotal": 130000,
+      "shipping_cost": 0,
+      "total_cost": 130000,
+      "total_tax": 13000,
+      "checkouted": true,
+      "checkoutTime": "1503728248",
+      "order_user": {
+        "facebook_id": "1385931291489306",
+        "first_name": "Quang",
+        "last_name": "Tran",
+        "gender": "male",
+        "timezone": 7,
+        "id": 2
+      },
+      "order_details": [
+        {
+          "quantity": 2,
+          "total_price": 130000,
+          "product": {
+            "name": "Big Mac",
+            "type": "Burger",
+            "item_url": "https://www.mcdonalds.com/us/en-us/product/big-mac.html",
+            "image_url": "https://www.mcdonalds.com/content/dam/usa/promotions/mobile/extravaluemeal-mobile.jpg",
+            "unit_price": 65000,
+            "currency": "VND",
+            "description": "The one and only.",
+            "payload_name": "BIG_MAC",
+            "id": 1
+          }
+        }
+      ],
+      "shipping_address": null,
+      "createdTime": 1503728224107,
+      "updatedTime": 1503728248479,
+      "id": 5
+    },
+    {
+      "order_id": "63824787",
+      "payment_type": "Cash",
+      "currency": "VND",
+      "subtotal": 195000,
+      "shipping_cost": 0,
+      "total_cost": 195000,
+      "total_tax": 19500,
+      "checkouted": true,
+      "checkoutTime": "1503729535",
+      "order_user": {
+        "facebook_id": "1385931291489306",
+        "first_name": "Quang",
+        "last_name": "Tran",
+        "gender": "male",
+        "timezone": 7,
+        "id": 2
+      },
+      "order_details": [
+        {
+          "quantity": 3,
+          "total_price": 195000,
+          "product": {
+            "name": "Big Mac",
+            "type": "Burger",
+            "item_url": "https://www.mcdonalds.com/us/en-us/product/big-mac.html",
+            "image_url": "https://www.mcdonalds.com/content/dam/usa/promotions/mobile/extravaluemeal-mobile.jpg",
+            "unit_price": 65000,
+            "currency": "VND",
+            "description": "The one and only.",
+            "payload_name": "BIG_MAC",
+            "id": 1
+          }
+        }
+      ],
+      "shipping_address": null,
+      "createdTime": 1503728687459,
+      "updatedTime": 1503729535052,
+      "id": 6
     }
   ]
 }
