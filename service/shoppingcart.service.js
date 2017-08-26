@@ -24,7 +24,7 @@ function checkout(senderId) {
   return orderRepository.getUncheckedoutOrder(senderId)
     .then(order => {
       order.checkouted = true;
-      order.checkoutTime = Date.now().toString();
+      order.checkoutTime = Math.floor(Date.now() / 1000).toString();
       return orderRepository.update(order);
     })
 };
@@ -89,7 +89,9 @@ function addItem(senderId, item) {
 }
 
 function getCurrentOrder(senderId) {
-  return orderRepository.getUncheckedoutOrder(senderId);
+  return orderRepository
+    .getUncheckedoutOrder(senderId)
+    .then(order => order ? order : createOrderIfnotExisted(senderId));
 }
 
 function setQuantityOfItem(senderId, item, quantity) {

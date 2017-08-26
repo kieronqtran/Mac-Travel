@@ -40,7 +40,7 @@
   },
   "nyc": {
     "exclude": [
-      "./**/*.spec.js"
+      "tests/**/*.js"
     ],
     "reporter": [
       "lcov",
