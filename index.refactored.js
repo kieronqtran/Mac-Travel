@@ -609,7 +609,13 @@ function sendCheckoutMessage(recipientId) {
                 currency: order_detail.product.currency,
                 image_url: order_detail.product.image_url,
               })),
-              address: null,
+              address: {
+                street_1: "702 Nguyen Van Linh",
+                city: "Ho Chi Minh",
+                postal_code: "700000",
+                state: "HCM",
+                country: "VN"
+              },
               summary: {
                 subtotal: bill.subtotal,
                 shipping_cost: bill.shipping_cost,
