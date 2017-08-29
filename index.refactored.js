@@ -136,56 +136,74 @@ function receivedMessage(event) {
   top:
   if (messageText) {
     switch (messageText.toLowerCase()) {
-      case "what is your website":
-      case "can i see your website":
-        sendTextMessage(senderID, "Our main page is: https://www.mcdonalds.com/us/en-us.html");
-        break;
+	    case "what is your website":
+	    case "can i see your website":
+	        sendTextMessage(senderID, "Our main page is: https://www.mcdonalds.com/us/en-us.html");
+	        break;
 
-      case "how are you":
-      case "how are you doing":
-        let randomIndex = Math.floor(Math.random() * feelingArray.length);
-        let feeling = feelingArray[randomIndex];
-        sendTextMessage(senderID, feeling);
-        break;
-      case "good morning":
-      case "morning":
-        sendTextMessage(senderID, "Good morning my dearest customer.");
-        break;
-      case "good afternoon":
-        sendTextMessage(senderID, "Good afternoon to my beloved customer :).");
-        break;
-      case "good evening":
-        sendTextMessage(senderID, "Good evening, my customer :).");
-        break;
-      case "good night":
-        sendTextMessage(senderID, "Good night, my customer.");
-        break;
-      case "i want to order":
-      case "i want something to eat":
-        sendTextMessage(senderID, "This is our menu. Please click on the option that you want.");
-        sendMenuMessage(senderID);
-        break;
+	    case "how are you":
+	    case "how are you doing":
+	        let randomIndex = Math.floor(Math.random() * feelingArray.length);
+	        let feeling = feelingArray[randomIndex];
+	        sendTextMessage(senderID, feeling);
+	        break;
+	    case "good morning":
+	    case "morning":
+	        sendTextMessage(senderID, "Good morning my dearest customer.");
+	        break;
+	    case "good afternoon":
+	        sendTextMessage(senderID, "Good afternoon to my beloved customer :).");
+	        break;
+	    case "good evening":
+	        sendTextMessage(senderID, "Good evening, my customer :).");
+	        break;
+	    case "good night":
+	        sendTextMessage(senderID, "Good night, my customer.");
+	        break;
+	    case "i want to order":
+	    case "i want something to eat":
+	        sendTextMessage(senderID, "This is our menu. Please click on the option that you want.");
+	        sendMenuMessage(senderID);
+	        break;
 
-      case "i want to buy some burgers":
-      case "i want to buy a burger":
-        sendTextMessage(senderID, "We have the best burgers in town. Please click on the option that you want.");
-        sendBurgerMenu(senderID);
-        break;
+	    case "i want to buy some burgers":
+	    case "i want to buy a burger":
+	        sendTextMessage(senderID, "We have the best burgers in town. Please click on the option that you want.");
+	        sendBurgerMenu(senderID);
+	        break;
 
-      case 'big macs':
-      case 'big mac':
-        sendBigMac(senderID);
-        break;
+	    case 'big macs':
+	    case 'big mac':
+	        sendBigMac(senderID);
+	        break;
 
-      case "i want some drink":
-        sendTextMessage(senderID, "This is our drink menu. Please click on the option that you want.");
-        sendDrinkMenu(senderID);
-        break;
+	    case "i want some drink":
+	        sendTextMessage(senderID, "This is our drink menu. Please click on the option that you want.");
+	        sendDrinkMenu(senderID);
+	        break;
 
-      case 'show order':
+	    case 'big mac':
+		case 'bigmacs':
+		case 'big macs':
+		    sendBurgerByName(senderID, 'Big Mac');
+		    break;
+
+		case 'sweet bbq bacon':
+		case 'bbq bacon':
+		case 'sweetbbqbacon':
+		case 'bbq bacon':
+			sendBurgerByName(senderID, 'Sweet BBQ Bacon');
+		    break;
+
+		case 'signature sriracha burger'
+			sendBurgerByName(senderID, 'Signature Sriracha Burger');
+		    break;
+
+
+      	case 'show order':
       //TODO: implement show order here
 
-      default:
+      	default:
         const messageList = messageText.split(/[\s,]+/);
         for (let i = 0; i < messageList.length; i++) {
           let message = messageList[i];
@@ -223,8 +241,10 @@ function receivedMessage(event) {
             case 'big mac':
             case 'bigmacs':
             case 'big macs':
-              sendBigMac(senderID);
+              sendBurgerByName(senderID, 'Big Mac');
               break top;
+
+
 
             case 'checkout':
               //TODO: implement checkout function here
@@ -415,8 +435,8 @@ function sendDrinkMenu(recipientId) {
   return callSendAPI(messageData);
 }
 
-function sendBigMac(recipientId) {
-  const burger = productRepository.getBurgerByName('Big Mac');
+function sendBurgerByName(recipientId, name) {
+  const burger = productRepository.getBurgerByName(name);
   const messageData = {
     recipient: {
       id: recipientId
