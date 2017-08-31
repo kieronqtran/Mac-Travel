@@ -534,6 +534,7 @@ function processPostback(event) {
 }
 
 function sendOrder(senderId) {
+  const userOrder = shoppingCartSevice.forUser(senderId);
   return userOrder
     .getCurrentOrder()
     .then(order => {
