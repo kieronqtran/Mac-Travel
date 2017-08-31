@@ -183,7 +183,8 @@ function receivedMessage(event) {
         break;
 
       case 'show order':
-      //TODO: implement show order here
+        sendOrder(senderID);
+        break;
 
       default:
         const messageList = messageText.split(/[\s,]+/);
@@ -227,7 +228,6 @@ function receivedMessage(event) {
               break top;
 
             case 'checkout':
-              //TODO: implement checkout function here
               sendCheckoutMessage(senderID);
               break top;
 
@@ -502,32 +502,7 @@ function processPostback(event) {
     sendMessage(senderId, { text: "Select your options:" });
     sendDrinkMenu(senderId);
   } else if (payload === "REVIEW") {
-    return userOrder
-      .getCurrentOrder()
-      .then(order => {
-        const elements = order.order_details
-          .map(order_detail => ({
-            "title": order_detail.product.name,
-            "subtitle": order_detail.product.description,
-            "image_url": order_detail.product.image_url,
-          }));
-        const messageData = {
-          recipient: {
-            id: senderId,
-          },
-          message: {
-            attachment: {
-              type: "template",
-              payload: {
-                template_type: "generic",
-                elements: elements
-              }
-            }
-          }
-        };
-        console.log(JSON.stringify(messageData, null, 2));
-        return messageData;
-      }).then(messageData => callSendAPI(messageData));
+    sendOrder(senderId);
   } else if (productRepository.getAllPayLoads()
     .some(p => p === payload)) { // will check if the payload is matching any payloads in the db
     const item = productRepository.getItemByPayload(payload);
@@ -558,6 +533,33 @@ function processPostback(event) {
   }
 }
 
+function sendOrder(senderId) {
+  return userOrder
+    .getCurrentOrder()
+    .then(order => {
+      const elements = order.order_details
+        .map(order_detail => ({
+          "title": order_detail.product.name,
+          "subtitle": order_detail.product.description,
+          "image_url": order_detail.product.image_url,
+        }));
+      const messageData = {
+        recipient: {
+          id: senderId,
+        },
+        message: {
+          attachment: {
+            type: "template",
+            payload: {
+              template_type: "generic",
+              elements: elements
+            }
+          }
+        }
+      };
+      return messageData;
+    }).then(messageData => callSendAPI(messageData));
+}
 // Duplicate logic with sendTextMessage
 function sendMessage(recipientId, message) {
   return rp.post({
