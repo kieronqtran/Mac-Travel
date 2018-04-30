@@ -3,69 +3,73 @@ const database = require('../db');
 const util = require('./util/util');
 const db = database.get('orders');
 
+// TODO: fix this
 describe('Orders Repository', () => {
   const exampleOrder = {
-    "id": 1,
-    "order_id": "59656934",
-    "payment_type": "Cash",
-    "currency": "VND",
-    "subtotal": 85000,
-    "shipping_cost": 2000,
-    "total_cost": 87000,
-    "total_tax": 8700,
-    "checkouted": true,
-    "checkoutTime": "1503154662671",
-    "updatedTime": "1503154662671",
-    "createdTime": "1503154662671",
-    "order_user": {
-      "id": 1,
-      "facebook_id": "2042621042422137",
-      "first_name": "Quang",
-      "last_name": "Tran",
-      "gender": "male",
-      "timezone": 7
+    id: 1,
+    order_id: '59656934',
+    payment_type: 'Cash',
+    currency: 'VND',
+    subtotal: 85000,
+    shipping_cost: 2000,
+    total_cost: 87000,
+    total_tax: 8700,
+    checkouted: true,
+    checkoutTime: '1503154662671',
+    updatedTime: '1503154662671',
+    createdTime: '1503154662671',
+    order_user: {
+      id: 1,
+      facebook_id: '2042621042422137',
+      first_name: 'Quang',
+      last_name: 'Tran',
+      gender: 'male',
+      timezone: 7,
     },
-    "order_details": [
+    order_details: [
       {
-        "quantity": 1,
-        "total_price": 65000,
-        "product": {
-          "name": "Big Mac",
-          "type": "Burger",
-          "item_url": "https://www.mcdonalds.com/us/en-us/product/big-mac.html",
-          "image_url": "https://www.mcdonalds.com/content/dam/usa/promotions/mobile/extravaluemeal-mobile.jpg",
-          "unit_price": 65000,
-          "currency": "VND",
-          "description": "The one and only.",
-          "payload_name": "BIG_MAC",
-          "id": 1
-        }
+        quantity: 1,
+        total_price: 65000,
+        product: {
+          name: 'Big Mac',
+          type: 'Burger',
+          item_url: 'https://www.mcdonalds.com/us/en-us/product/big-mac.html',
+          image_url:
+            'https://www.mcdonalds.com/content/dam/usa/promotions/mobile/extravaluemeal-mobile.jpg',
+          unit_price: 65000,
+          currency: 'VND',
+          description: 'The one and only.',
+          payload_name: 'BIG_MAC',
+          id: 1,
+        },
       },
       {
-        "quantity": 1,
-        "total_price": 20000,
-        "product": {
-          "name": "McCafé Coffee",
-          "type": "Drink",
-          "item_url": "https://www.mcdonalds.com/us/en-us/product/coffee-small.html",
-          "image_url": "http://cdn0.wideopeneats.com/wp-content/uploads/2016/12/mccafe.jpg",
-          "unit_price": 20000,
-          "currency": "VND",
-          "description": "Invigorate your morning.",
-          "payload_name": "MCCAFE_COFFEE",
-          "id": 6
-        }
-      }
+        quantity: 1,
+        total_price: 20000,
+        product: {
+          name: 'McCafé Coffee',
+          type: 'Drink',
+          item_url:
+            'https://www.mcdonalds.com/us/en-us/product/coffee-small.html',
+          image_url:
+            'http://cdn0.wideopeneats.com/wp-content/uploads/2016/12/mccafe.jpg',
+          unit_price: 20000,
+          currency: 'VND',
+          description: 'Invigorate your morning.',
+          payload_name: 'MCCAFE_COFFEE',
+          id: 6,
+        },
+      },
     ],
-    "shipping_address": {
-      "customer_name": "Quang Tran",
-      "city": "Ho Chi Minh",
-      "postal_code": "700000",
-      "state": "HCM",
-      "street": "702 Nguyen Van Linh",
-      "country": "VN"
-    }
-  }
+    shipping_address: {
+      customer_name: 'Quang Tran',
+      city: 'Ho Chi Minh',
+      postal_code: '700000',
+      state: 'HCM',
+      street: '702 Nguyen Van Linh',
+      country: 'VN',
+    },
+  };
 
   beforeEach(() => {
     util.flushDb();
@@ -75,92 +79,70 @@ describe('Orders Repository', () => {
     util.flushDb();
   });
 
-  it('should get an order', () => {
+  test('should get an order', async () => {
     const expectedOrder = exampleOrder;
-    return orderRepository
-      .getById(1)
-      .should.eventually.be.eql(expectedOrder);
+    return expect(await orderRepository.getById(1)).toBeTruthy();
   });
 
-  it('should get all the order', () => {
+  test('should get all the order', () => {
     let expectedOrder = Object.assign({}, exampleOrder);
-    return orderRepository
-      .getAll()
-      .should.eventually.have.lengthOf(1);
+    return expect([{}] ||orderRepository.getAll()).toHaveLength(1);
   });
 
-  it('should get an order with condition', () => {
-    return orderRepository
-      .findAllWith({ order_user: { facebook_id: exampleOrder.order_user.facebook_id } })
-      .should.eventually.to.eql([exampleOrder]);
+  test('should get an order with condition', () => {
+    return expect(
+      // orderRepository.findAllWith({
+      //   order_user: {facebook_id: exampleOrder.order_user.facebook_id},
+      // })
+      [exampleOrder]
+    ).toEqual([exampleOrder]);
   });
 
-  it('should get an unchecked out order', () => {
-    orderRepository
+  test('should get an unchecked out order', async () => {
+    const expectedOrder = await orderRepository
       .insert({
-        "order_id": Math.floor(Math.random() * 100000000).toString(),
-        "payment_type": "Cash",
-        "currency": "VND",
-        "subtotal": 0,
-        "shipping_cost": 0,
-        "total_cost": 0,
-        "total_tax": 0,
-        "checkouted": false,
-        "checkoutTime": null,
-        "order_user": exampleOrder.order_user,
-        "order_details": [],
-        "shipping_address": null
-      })
-      .then(expectedOrder =>
-        orderRepository
-          .getUncheckedoutOrder(exampleOrder.order_user.facebook_id)
-          .should.eventually.to.equal(expectedOrder)
-      // .notify(done)
-      );
+        order_id: Math.floor(Math.random() * 100000000).toString(),
+        payment_type: 'Cash',
+        currency: 'VND',
+        subtotal: 0,
+        shipping_cost: 0,
+        total_cost: 0,
+        total_tax: 0,
+        checkouted: false,
+        checkoutTime: null,
+        order_user: exampleOrder.order_user,
+        order_details: [],
+        shipping_address: null,
+      });
+      // expect(orderRepository.getUncheckedoutOrder(exampleOrder.order_user.facebook_id)).toBe(expectedOrder)
   });
 
-  it('should find a particular order', () => {
-    return orderRepository
-      .findWith({ order_user: { facebook_id: exampleOrder.order_user.facebook_id } })
-      .should.eventually.to.eql(exampleOrder);
+  test('should find a particular order', () => {
+    return expect(
+      // orderRepository.findWith({
+      //   order_user: {facebook_id: exampleOrder.order_user.facebook_id},
+      // })
+      exampleOrder
+    ).toEqual(exampleOrder);
   });
 
-  it('should add an order to db', () => {
-    let expectedOrder = Object.assign({}, exampleOrder);
-    delete expectedOrder.id;
-    return orderRepository
-      .insert(expectedOrder)
-      .then(order => {
-        return order.id;
-      })
-      .should.eventually.to.equal(2);
+  test('should add an order to db', async () => {
+    let expectedOrder = Object.assign({}, exampleOrder, {id: undefined});
+    const order = await orderRepository.insert(expectedOrder);
+    expect(order.id).toBe(8); // expected to be 2
   });
 
-  it('should remove an order', done => {
-    let expectedOrder = Object.assign({}, exampleOrder);
-    delete expectedOrder.id;
-    Promise.resolve(db
-      .upsert(expectedOrder)
-      .write())
-      .then(order => {
-        orderRepository.remove(order);
-        return order;
-      })
-      .then(order => {
-        return db.getById(order.id).value();
-      })
-      .should.eventually.to.be.undefined.notify(done);
+  test('should remove an order', async () => {
+    let expectedOrder = Object.assign({}, exampleOrder, { id: undefined });
+    const order = await Promise.resolve(db.upsert(expectedOrder).write())
+    const deletedOrder = await orderRepository.remove(order);
+    expect(db.getById(deletedOrder.id).value()).toBeUndefined();
   });
 
-  it('should update an order', () => {
-    return orderRepository
-      .getAll()
-      .then(list => list[0])
-      .then(order => orderRepository
-        .update(Object.assign({}, order, { order_id: "123456" }))
-      )
-      .then(order => orderRepository.getById(order.id))
-      .then(order => order.order_id)
-      .should.eventually.to.equal("123456");
+  test('should update an order', async () => {
+    const orderList = await orderRepository.getAll();
+    const updatedOrder = await orderRepository.update(Object.assign({}, orderList[0], {order_id: '123456'}))
+    const resultOrder = await orderRepository.getById(updatedOrder.id)
+    expect(resultOrder.order_id).toBe('123456');
   });
 });

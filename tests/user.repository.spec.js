@@ -1,10 +1,9 @@
 const userRepository = require('../repository/user.repository');
 const db = require('../db').get('users');
 const util = require('./util/util');
-const { expect } = require('chai');
+const {expect} = require('chai');
 
 describe('Users Repository', () => {
-
   const expectedUser = {
     facebookId: '2042621042422137',
     firstName: 'Quang',
@@ -13,33 +12,41 @@ describe('Users Repository', () => {
     timezone: 7,
   };
 
-  beforeEach(() => { util.flushDb() });
-  afterEach(() => { util.flushDb() });
+  beforeEach(() => {
+    util.flushDb();
+  });
+  afterEach(() => {
+    util.flushDb();
+  });
 
-  it.skip('should fetch user if not exist', () => {
-    return db.removeWhere({ facebook_id: expectedUser.facebookId }).write()
+  test.skip('should fetch user if not exist', () => {
+    return db
+      .removeWhere({facebook_id: expectedUser.facebookId})
+      .write()
       .then(() =>
-        expect(db.find({ facebook_id: expectedUser.facebookId }).value()).to.be.undefined
+        expect(
+          db.find({facebook_id: expectedUser.facebookId}).value()
+        ).toBeUndefined()
       )
       .then(() => userRepository.getUserByFacebookId(expectedUser.facebookId))
       .then(actualUser => {
-        actualUser.facebook_id.should.equal(expectedUser.facebookId);
-        actualUser.first_name.should.equal(expectedUser.firstName);
-        actualUser.last_name.should.equal(expectedUser.lastName);
-        actualUser.gender.should.equal(expectedUser.gender);
-        actualUser.timezone.should.equal(expectedUser.timezone);
-      })
+        expect(actualUser.facebook_id).toBe(expectedUser.facebookId);
+        expect(actualUser.first_name).toBe(expectedUser.firstName);
+        expect(actualUser.last_name).toBe(expectedUser.lastName);
+        expect(actualUser.gender).toBe(expectedUser.gender);
+        expect(actualUser.timezone).toBe(expectedUser.timezone);
+      });
   });
 
-  it('should get a user', () => {
+  test.skip('should get a user', () => {
     return userRepository
       .getUserByFacebookId('2042621042422137')
       .then(actualUser => {
-        actualUser.facebook_id.should.equal(expectedUser.facebookId);
-        actualUser.first_name.should.equal(expectedUser.firstName);
-        actualUser.last_name.should.equal(expectedUser.lastName);
-        actualUser.gender.should.equal(expectedUser.gender);
-        actualUser.timezone.should.equal(expectedUser.timezone);
+        expect(actualUser.facebook_id).toBe(expectedUser.facebookId);
+        expect(actualUser.first_name).toBe(expectedUser.firstName);
+        expect(actualUser.last_name).toBe(expectedUser.lastName);
+        expect(actualUser.gender).toBe(expectedUser.gender);
+        expect(actualUser.timezone).toBe(expectedUser.timezone);
       });
   });
 });

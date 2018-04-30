@@ -17,77 +17,77 @@ const productTable = database.get('products');
  */
 
 /**
-  * return <Product>[] list of burgers
-  */
-exports.getAllBurgers = function () {
+ * return <Product>[] list of burgers
+ */
+exports.getAllBurgers = function() {
   const burgers = productTable.filter(e => e.type === 'Burger').value();
   return burgers;
 };
 
 /**
-  * return <Product>[] list of drinks
-  */
-exports.getAllDrinks = function () {
+ * return <Product>[] list of drinks
+ */
+exports.getAllDrinks = function() {
   const burgers = productTable.filter(e => e.type === 'Drink').value();
   return burgers;
 };
 
 /**
-  * return <Product>[] list of all food
-  */
-exports.getAllProducts = function () {
+ * return <Product>[] list of all food
+ */
+exports.getAllProducts = function() {
   return productTable.value();
 };
 
 /**
-  * return <Product>[] list of payload name
-  */
-exports.getAllPayLoads = function () {
+ * return <Product>[] list of payload name
+ */
+exports.getAllPayLoads = function() {
   return productTable.value().map(p => p.payload_name);
 };
 
-exports.findProductById = function (id) {
-  return productTable.find({ id: id }).value();
+exports.findProductById = function(id) {
+  return productTable.find({id: id}).value();
 };
 
-exports.findDrinkById = function (id) {
-  return productTable.find({ id: id, type: 'Drink' }).value();
+exports.findDrinkById = function(id) {
+  return productTable.find({id: id, type: 'Drink'}).value();
 };
 
-exports.findBurgerById = function (id) {
-  return productTable.find({ id: id, type: 'Burger' }).value();
+exports.findBurgerById = function(id) {
+  return productTable.find({id: id, type: 'Burger'}).value();
 };
 
-exports.getProductByNameAndType = function (name, type) {
-  const product = productTable.find({ name, type }).value();
+exports.getProductByNameAndType = function(name, type) {
+  const product = productTable.find({name, type}).value();
   return product;
 };
 
-exports.getProductById = function (id) {
-  const product = productTable.find({ id }).value();
+exports.getProductById = function(id) {
+  const product = productTable.find({id}).value();
   return product;
 };
 
-exports.getProductByName = function (name) {
-  const product = productTable.find({ name: name }).value();
+exports.getProductByName = function(name) {
+  const product = productTable.find({name: name}).value();
   return product;
 };
 
-exports.getBurgerByName = function (name) {
-  const product = productTable.find({ name: name, type: 'Burger' }).value();
+exports.getBurgerByName = function(name) {
+  const product = productTable.find({name: name, type: 'Burger'}).value();
   return product;
 };
 
-exports.getItemByPayload = function (payload) {
+exports.getItemByPayload = function(payload) {
   const product = productTable.find(p => p.payload_name === payload).value();
   return product;
 };
 
-exports.getDrinkByName = function (name) {
-  const product = productTable.find({ name: name, type: 'Drink' }).value();
+exports.getDrinkByName = function(name) {
+  const product = productTable.find({name: name, type: 'Drink'}).value();
   return product;
 };
 
-exports.addProduct = function (product) {
+exports.addProduct = function(product) {
   return productTable.upsert(product).value();
 };

@@ -3,6 +3,6 @@ const chai = require('chai');
 const sinonChai = require('sinon-chai');
 const chaiAsPromised = require('chai-as-promised');
 
-chai.should();
+expect(chai)();
 chai.use(chaiAsPromised);
 chai.use(sinonChai);

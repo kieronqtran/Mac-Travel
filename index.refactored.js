@@ -11,44 +11,48 @@ const {
   PAGE_ACCESS_TOKEN,
   SERVER_URL,
   DATABASE_LOCATION,
-  } = require('./config');
+} = require('./config');
 const productRepository = require('./repository/product.repository');
 const userRepository = require('./repository/user.repository');
 const shoppingCartSevice = require('./service/shoppingcart.service');
 
 if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
-  console.error("Missing config values");
+  console.error('Missing config values');
   process.exit(1);
 }
 
 const app = express();
 app.set('port', process.env.PORT || 5000);
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
-app.get('/', function (req, res) {
+app.get('/', function(req, res) {
   res.send('Hi! This is my chatbot.');
 });
 
 // Access to db.json from browser with URI /db
-app.get('/db', function (req, res) {
-  fs.readFile(path.resolve(__dirname, DATABASE_LOCATION), 'utf8',
-    function (err, data) {
-      if (err) {
-        return console.error(err);
-      }
-      res.send(`<pre>${data}</pre>`);
-    });
+app.get('/db', function(req, res) {
+  fs.readFile(path.resolve(__dirname, DATABASE_LOCATION), 'utf8', function(
+    err,
+    data
+  ) {
+    if (err) {
+      return console.error(err);
+    }
+    res.send(`<pre>${data}</pre>`);
+  });
 });
 
 // Validating token
-app.get('/webhook', function (req, res) {
-  if (req.query['hub.mode'] === 'subscribe' &&
-    req.query['hub.verify_token'] === VALIDATION_TOKEN) {
-    console.log("Validating webhook");
+app.get('/webhook', function(req, res) {
+  if (
+    req.query['hub.mode'] === 'subscribe' &&
+    req.query['hub.verify_token'] === VALIDATION_TOKEN
+  ) {
+    console.log('Validating webhook');
     res.status(200).send(req.query['hub.challenge']);
   } else {
-    console.error("Invalid token.");
+    console.error('Invalid token.');
     res.sendStatus(403);
   }
 });
@@ -60,7 +64,7 @@ app.get('/webhook', function (req, res) {
  * https://developers.facebook.com/docs/messenger-platform/product-overview/setup#subscribe_app
  *
  */
-app.post('/webhook', function (req, res) {
+app.post('/webhook', function(req, res) {
   const data = req.body;
 
   console.log(JSON.stringify(data, null, 2));
@@ -68,18 +72,21 @@ app.post('/webhook', function (req, res) {
   if (data.object === 'page') {
     // Iterate over each entry
     // There may be multiple if batched
-    data.entry.forEach(function (pageEntry) {
+    data.entry.forEach(function(pageEntry) {
       const pageID = pageEntry.id;
       const timeOfEvent = pageEntry.time;
 
       // Iterate over each messaging event
-      pageEntry.messaging.forEach(function (messagingEvent) {
+      pageEntry.messaging.forEach(function(messagingEvent) {
         if (messagingEvent.message) {
           receivedMessage(messagingEvent);
         } else if (messagingEvent.postback) {
           processPostback(messagingEvent);
         } else {
-          console.log("Webhook received unknown messagingEvent: ", messagingEvent);
+          console.log(
+            'Webhook received unknown messagingEvent: ',
+            messagingEvent
+          );
         }
       });
     });
@@ -98,23 +105,20 @@ function checkTime(senderID) {
     .then(user => {
       const date = new Date();
       const hour = date.getUTCHours() + user.timezone;
-      if (hour < 12)
-        return `Good morning, ${user.first_name}`;
-      if (hour >= 12 && hour < 18)
-        return `Good afternoon, ${user.first_name}`;
-      if (hour >= 18 && hour < 21)
-        return `Good evening, ${user.first_name}`;
-      if (hour >= 21)
-        return `Good night, ${user.first_name}`;
+      if (hour < 12) return `Good morning, ${user.first_name}`;
+      if (hour >= 12 && hour < 18) return `Good afternoon, ${user.first_name}`;
+      if (hour >= 18 && hour < 21) return `Good evening, ${user.first_name}`;
+      if (hour >= 21) return `Good night, ${user.first_name}`;
     })
-    .then(messege => sendTextMessage(senderID, messege))
+    .then(messege => sendTextMessage(senderID, messege));
 }
 
 // List of Answers:
 let feelingArray = [
   "I'm very good. Thank you for asking :)",
   "I'm doing very well today :). Thank you!",
-  "I'm fine. Thank you very much!", "Very well.",
+  "I'm fine. Thank you very much!",
+  'Very well.',
 ];
 
 function receivedMessage(event) {
@@ -123,8 +127,12 @@ function receivedMessage(event) {
   const timeOfMessage = event.timestamp;
   const message = event.message;
 
-  console.log("Received message for user %d and page %d at %d with message:",
-    senderID, recipientID, timeOfMessage);
+  console.log(
+    'Received message for user %d and page %d at %d with message:',
+    senderID,
+    recipientID,
+    timeOfMessage
+  );
 
   const messageId = message.mid;
   const appId = message.app_id;
@@ -133,42 +141,50 @@ function receivedMessage(event) {
   // You may get a text or attachment but not both
   const messageText = message.text;
 
-  top:
-  if (messageText) {
+  top: if (messageText) {
     switch (messageText.toLowerCase()) {
-      case "what is your website":
-      case "can i see your website":
-        sendTextMessage(senderID, "Our main page is: https://www.mcdonalds.com/us/en-us.html");
+      case 'what is your website':
+      case 'can i see your website':
+        sendTextMessage(
+          senderID,
+          'Our main page is: https://www.mcdonalds.com/us/en-us.html'
+        );
         break;
 
-      case "how are you":
-      case "how are you doing":
+      case 'how are you':
+      case 'how are you doing':
         let randomIndex = Math.floor(Math.random() * feelingArray.length);
         let feeling = feelingArray[randomIndex];
         sendTextMessage(senderID, feeling);
         break;
-      case "good morning":
-      case "morning":
-        sendTextMessage(senderID, "Good morning my dearest customer.");
+      case 'good morning':
+      case 'morning':
+        sendTextMessage(senderID, 'Good morning my dearest customer.');
         break;
-      case "good afternoon":
-        sendTextMessage(senderID, "Good afternoon to my beloved customer :).");
+      case 'good afternoon':
+        sendTextMessage(senderID, 'Good afternoon to my beloved customer :).');
         break;
-      case "good evening":
-        sendTextMessage(senderID, "Good evening, my customer :).");
+      case 'good evening':
+        sendTextMessage(senderID, 'Good evening, my customer :).');
         break;
-      case "good night":
-        sendTextMessage(senderID, "Good night, my customer.");
+      case 'good night':
+        sendTextMessage(senderID, 'Good night, my customer.');
         break;
-      case "i want to order":
-      case "i want something to eat":
-        sendTextMessage(senderID, "This is our menu. Please click on the option that you want.");
+      case 'i want to order':
+      case 'i want something to eat':
+        sendTextMessage(
+          senderID,
+          'This is our menu. Please click on the option that you want.'
+        );
         sendMenuMessage(senderID);
         break;
 
-      case "i want to buy some burgers":
-      case "i want to buy a burger":
-        sendTextMessage(senderID, "We have the best burgers in town. Please click on the option that you want.");
+      case 'i want to buy some burgers':
+      case 'i want to buy a burger':
+        sendTextMessage(
+          senderID,
+          'We have the best burgers in town. Please click on the option that you want.'
+        );
         sendBurgerMenu(senderID);
         break;
 
@@ -177,8 +193,11 @@ function receivedMessage(event) {
         sendBigMac(senderID);
         break;
 
-      case "i want some drink":
-        sendTextMessage(senderID, "This is our drink menu. Please click on the option that you want.");
+      case 'i want some drink':
+        sendTextMessage(
+          senderID,
+          'This is our drink menu. Please click on the option that you want.'
+        );
         sendDrinkMenu(senderID);
         break;
 
@@ -200,24 +219,36 @@ function receivedMessage(event) {
             case 'menu':
             case 'order':
             case 'eat':
-              sendTextMessage(senderID, "This is our menu. Please click on the option that you want.");
+              sendTextMessage(
+                senderID,
+                'This is our menu. Please click on the option that you want.'
+              );
               sendMenuMessage(senderID);
               break top;
 
             case 'burger':
             case 'burgers':
-              sendTextMessage(senderID, "We have different kinds of burger. Please click on the option that you want.");
+              sendTextMessage(
+                senderID,
+                'We have different kinds of burger. Please click on the option that you want.'
+              );
               sendBurgerMenu(senderID);
               break top;
 
             case 'drink':
             case 'beverage':
-              sendTextMessage(senderID, "The drink menu is sent to you. Please click on the option that you want.");
+              sendTextMessage(
+                senderID,
+                'The drink menu is sent to you. Please click on the option that you want.'
+              );
               sendDrinkMenu(senderID);
               break top;
 
             case 'website':
-              sendTextMessage(senderID, "Do you mean our website? If yes, this is it https://www.mcdonalds.com/us/en-us.html");
+              sendTextMessage(
+                senderID,
+                'Do you mean our website? If yes, this is it https://www.mcdonalds.com/us/en-us.html'
+              );
               break top;
 
             case 'bigmac':
@@ -232,14 +263,19 @@ function receivedMessage(event) {
               break top;
 
             case 'website':
-              sendTextMessage(senderID, "Do you mean our website? If yes, this is it https://www.mcdonalds.com/us/en-us.html");
+              sendTextMessage(
+                senderID,
+                'Do you mean our website? If yes, this is it https://www.mcdonalds.com/us/en-us.html'
+              );
               break top;
             default:
-              if (i == (messageList.length - 1)) {
-                sendTextMessage(senderID, "I don't quite catch that. Please try again");
+              if (i == messageList.length - 1) {
+                sendTextMessage(
+                  senderID,
+                  "I don't quite catch that. Please try again"
+                );
                 break top;
-              }
-              else continue;
+              } else continue;
           }
         }
     }
@@ -262,12 +298,17 @@ function receivedPostback(event) {
   // button for Structured Messages.
   const payload = event.postback.payload;
 
-  console.log("Received postback for user %d and page %d with payload '%s' " +
-    "at %d", senderID, recipientID, payload, timeOfPostback);
+  console.log(
+    "Received postback for user %d and page %d with payload '%s' " + 'at %d',
+    senderID,
+    recipientID,
+    payload,
+    timeOfPostback
+  );
 
   // When a postback is called, we'll send a message back to the sender to
   // let them know it was successful
-  sendTextMessage(senderID, "Postback called");
+  sendTextMessage(senderID, 'Postback called');
 }
 
 /*
@@ -277,12 +318,12 @@ function receivedPostback(event) {
 function sendTextMessage(recipientId, messageText) {
   const messageData = {
     recipient: {
-      id: recipientId
+      id: recipientId,
     },
     message: {
       text: messageText,
-      metadata: "DEVELOPER_DEFINED_METADATA"
-    }
+      metadata: 'DEVELOPER_DEFINED_METADATA',
+    },
   };
 
   // Always return promise even it's null
@@ -295,41 +336,47 @@ function sendTextMessage(recipientId, messageText) {
 function sendMenuMessage(recipientId) {
   const messageData = {
     recipient: {
-      id: recipientId
+      id: recipientId,
     },
     message: {
       attachment: {
-        type: "template",
+        type: 'template',
         payload: {
-          template_type: "generic",
-          elements: [{
-            title: "Welcome to MACTravel\'s page",
-            subtitle: "Take a Food Tour of our Full Menu",
-            item_url: "https://www.mcdonalds.com/us/en-us/full-menu.html",
-            image_url: "https://www.mcdonalds.com/content/dam/usa/promotions/desktop/OFYQ_960x542.jpg",
-            buttons: [{
-              type: "web_url",
-              url: "https://www.mcdonalds.com/us/en-us/full-menu.html",
-              title: "Open Website"
-            }, {
-              type: "postback",
-              title: "Burger Menu",
-              payload: "BURGER_MENU",
-            }, {
-              type: "postback",
-              title: "Drink Menu",
-              payload: "DRINK_MENU",
-            }]
-          }]
-        }
-      }
-    }
+          template_type: 'generic',
+          elements: [
+            {
+              title: "Welcome to MACTravel's page",
+              subtitle: 'Take a Food Tour of our Full Menu',
+              item_url: 'https://www.mcdonalds.com/us/en-us/full-menu.html',
+              image_url:
+                'https://www.mcdonalds.com/content/dam/usa/promotions/desktop/OFYQ_960x542.jpg',
+              buttons: [
+                {
+                  type: 'web_url',
+                  url: 'https://www.mcdonalds.com/us/en-us/full-menu.html',
+                  title: 'Open Website',
+                },
+                {
+                  type: 'postback',
+                  title: 'Burger Menu',
+                  payload: 'BURGER_MENU',
+                },
+                {
+                  type: 'postback',
+                  title: 'Drink Menu',
+                  payload: 'DRINK_MENU',
+                },
+              ],
+            },
+          ],
+        },
+      },
+    },
   };
 
   // Always return promise even it's null
   return callSendAPI(messageData);
 }
-
 
 function sendBurgerMenu(recipientId) {
   const burgers = productRepository.getAllBurgers(); // get all burgers in product
@@ -340,19 +387,23 @@ function sendBurgerMenu(recipientId) {
       subtitle: burger.description,
       item_url: burger.item_url,
       image_url: burger.image_url,
-      buttons: [{
-        type: 'web_url',
-        url: burger.item_url,
-        title: 'Open Website',
-      }, {
-        type: 'postback',
-        title: 'Order This Burger',
-        payload: burger.payload_name,
-      }, {
-        type: 'postback',
-        title: 'Exit',
-        payload: 'EXIT_' + burger.payload_name,
-      }],
+      buttons: [
+        {
+          type: 'web_url',
+          url: burger.item_url,
+          title: 'Open Website',
+        },
+        {
+          type: 'postback',
+          title: 'Order This Burger',
+          payload: burger.payload_name,
+        },
+        {
+          type: 'postback',
+          title: 'Exit',
+          payload: 'EXIT_' + burger.payload_name,
+        },
+      ],
     };
   });
   const messageData = {
@@ -382,34 +433,38 @@ function sendDrinkMenu(recipientId) {
       subtitle: drink.description,
       item_url: drink.item_url,
       image_url: drink.image_url,
-      buttons: [{
-        type: 'web_url',
-        url: drink.item_url,
-        title: 'Open Website',
-      }, {
-        type: 'postback',
-        title: 'Order This Drink',
-        payload: drink.payload_name,
-      }, {
-        type: 'postback',
-        title: 'Exit',
-        payload: 'EXIT_' + drink.payload_name,
-      }],
+      buttons: [
+        {
+          type: 'web_url',
+          url: drink.item_url,
+          title: 'Open Website',
+        },
+        {
+          type: 'postback',
+          title: 'Order This Drink',
+          payload: drink.payload_name,
+        },
+        {
+          type: 'postback',
+          title: 'Exit',
+          payload: 'EXIT_' + drink.payload_name,
+        },
+      ],
     };
   });
   const messageData = {
     recipient: {
-      id: recipientId
+      id: recipientId,
     },
     message: {
       attachment: {
-        type: "template",
+        type: 'template',
         payload: {
-          template_type: "generic",
-          elements: payloadElements
-        }
-      }
-    }
+          template_type: 'generic',
+          elements: payloadElements,
+        },
+      },
+    },
   };
   // Always return promise even it's null
   return callSendAPI(messageData);
@@ -419,35 +474,41 @@ function sendBigMac(recipientId) {
   const burger = productRepository.getBurgerByName('Big Mac');
   const messageData = {
     recipient: {
-      id: recipientId
+      id: recipientId,
     },
     message: {
       attachment: {
-        type: "template",
+        type: 'template',
         payload: {
-          template_type: "generic",
-          elements: [{
-            title: burger.name,
-            subtitle: burger.description,
-            item_url: burger.item_url,
-            image_url: burger.image_url,
-            buttons: [{
-              type: 'web_url',
-              url: burger.item_url,
-              title: 'Open Website',
-            }, {
-              type: 'postback',
-              title: 'Order This Drink',
-              payload: burger.payload_name,
-            }, {
-              type: 'postback',
-              title: 'Exit',
-              payload: 'EXIT_' + burger.payload_name,
-            }],
-          }]
-        }
-      }
-    }
+          template_type: 'generic',
+          elements: [
+            {
+              title: burger.name,
+              subtitle: burger.description,
+              item_url: burger.item_url,
+              image_url: burger.image_url,
+              buttons: [
+                {
+                  type: 'web_url',
+                  url: burger.item_url,
+                  title: 'Open Website',
+                },
+                {
+                  type: 'postback',
+                  title: 'Order This Drink',
+                  payload: burger.payload_name,
+                },
+                {
+                  type: 'postback',
+                  title: 'Exit',
+                  payload: 'EXIT_' + burger.payload_name,
+                },
+              ],
+            },
+          ],
+        },
+      },
+    },
   };
 
   // Always return promise even it's null
@@ -457,30 +518,35 @@ function sendBigMac(recipientId) {
 function confirmingOrder(recipientId, product) {
   const messageData = {
     recipient: {
-      id: recipientId
+      id: recipientId,
     },
     message: {
       attachment: {
-        type: "template",
+        type: 'template',
         payload: {
-          template_type: "button",
-          text: "Confirmation: if you want " + product.name + " add to your order.",
-          buttons: [{
-            type: "postback",
-            title: "Review your order",
-            payload: "REVIEW"
-          }, {
-            type: "postback",
-            title: "Yes",
-            payload: "CONFIRM_" + product.payload_name
-          }, {
-            type: "postback",
-            title: "No",
-            payload: "DECLINE_" + product.payload_name
-          }]
-        }
-      }
-    }
+          template_type: 'button',
+          text:
+            'Confirmation: if you want ' + product.name + ' add to your order.',
+          buttons: [
+            {
+              type: 'postback',
+              title: 'Review your order',
+              payload: 'REVIEW',
+            },
+            {
+              type: 'postback',
+              title: 'Yes',
+              payload: 'CONFIRM_' + product.payload_name,
+            },
+            {
+              type: 'postback',
+              title: 'No',
+              payload: 'DECLINE_' + product.payload_name,
+            },
+          ],
+        },
+      },
+    },
   };
   // Always return promise even it's null
   return callSendAPI(messageData);
@@ -490,46 +556,56 @@ function processPostback(event) {
   const senderId = event.sender.id;
   const payload = event.postback.payload;
   const userOrder = shoppingCartSevice.forUser(senderId);
-  if (payload === "Greeting") { // ?? When this payload is called?
-    userRepository.getUserByFacebookId(senderId)
-      .then(user =>
-        `Hi ${user.gender === 'male' ? 'Mr.' : 'Ms.'}${user.first_name} ${user.last_name}. Welcome to MACTravel for the first time. Type 'menu' to show our menu`)
-      .then(message => sendMessage(senderId, { text: message }));
-  } else if (payload === "BURGER_MENU") {
-    sendMessage(senderId, { text: "Select your options:" });
+  if (payload === 'Greeting') {
+    // ?? When this payload is called?
+    userRepository
+      .getUserByFacebookId(senderId)
+      .then(
+        user =>
+          `Hi ${user.gender === 'male' ? 'Mr.' : 'Ms.'}${user.first_name} ${
+            user.last_name
+          }. Welcome to MACTravel for the first time. Type 'menu' to show our menu`
+      )
+      .then(message => sendMessage(senderId, {text: message}));
+  } else if (payload === 'BURGER_MENU') {
+    sendMessage(senderId, {text: 'Select your options:'});
     sendBurgerMenu(senderId);
-  } else if (payload === "DRINK_MENU") {
-    sendMessage(senderId, { text: "Select your options:" });
+  } else if (payload === 'DRINK_MENU') {
+    sendMessage(senderId, {text: 'Select your options:'});
     sendDrinkMenu(senderId);
-  } else if (payload === "REVIEW") {
+  } else if (payload === 'REVIEW') {
     sendOrder(senderId);
-  } else if (productRepository.getAllPayLoads()
-    .some(p => p === payload)) { // will check if the payload is matching any payloads in the db
+  } else if (productRepository.getAllPayLoads().some(p => p === payload)) {
+    // will check if the payload is matching any payloads in the db
     const item = productRepository.getItemByPayload(payload);
     confirmingOrder(senderId, item);
   } else if (/EXIT_/.test(payload)) {
     const extractedPayload = payload.split('EXIT_')[1];
     const item = productRepository.getItemByPayload(extractedPayload);
     sendMessage(senderId, {
-      text:
-      `Type 'menu' to continue to your order.\nType 'show order' to see what you have ordered.\nType 'checkout' to finish your order.`
+      text: `Type 'menu' to continue to your order.\nType 'show order' to see what you have ordered.\nType 'checkout' to finish your order.`,
     });
   } else if (/CONFIRM_/.test(payload)) {
     const extractedPayload = payload.split('CONFIRM_')[1];
     const item = productRepository.getItemByPayload(extractedPayload);
-    userOrder.addItem(item)
+    userOrder
+      .addItem(item)
       // The sending messages should guide users what to do next.
-      .then(() => sendMessage(senderId,
-        {
-          text: `Adding ${item.name} is successful.\nType 'menu' to continue to your order.\nType 'show order' to see what you have ordered.\nType 'checkout' to finish your order.`
-        }));
+      .then(() =>
+        sendMessage(senderId, {
+          text: `Adding ${
+            item.name
+          } is successful.\nType 'menu' to continue to your order.\nType 'show order' to see what you have ordered.\nType 'checkout' to finish your order.`,
+        })
+      );
   } else if (/DECLINE_/.test(payload)) {
     const extractedPayload = payload.split('DECLINE_')[1];
     const item = productRepository.getItemByPayload(extractedPayload);
-    sendMessage(senderId,
-      {
-        text: `${item.name} has declined.\nType 'menu' to continue to your order.\nType 'show order' to see what you have ordered.\nType 'checkout' to finish your order.`
-      });
+    sendMessage(senderId, {
+      text: `${
+        item.name
+      } has declined.\nType 'menu' to continue to your order.\nType 'show order' to see what you have ordered.\nType 'checkout' to finish your order.`,
+    });
   }
 }
 
@@ -538,52 +614,66 @@ function sendOrder(senderId) {
   return userOrder
     .getCurrentOrder()
     .then(order => {
-      const elements = order.order_details
-        .map(order_detail => ({
-          "title": order_detail.product.name,
-          "subtitle": order_detail.product.description,
-          "image_url": order_detail.product.image_url,
-        }));
+      const elements = order.order_details.map(order_detail => ({
+        title: order_detail.product.name,
+        subtitle: order_detail.product.description,
+        image_url: order_detail.product.image_url,
+      }));
       const messageData = {
         recipient: {
           id: senderId,
         },
         message: {
           attachment: {
-            type: "template",
+            type: 'template',
             payload: {
-              template_type: "generic",
-              elements: elements
-            }
-          }
-        }
+              template_type: 'generic',
+              elements: elements,
+            },
+          },
+        },
       };
       return messageData;
-    }).then(messageData => callSendAPI(messageData));
+    })
+    .then(messageData => callSendAPI(messageData));
 }
 // Duplicate logic with sendTextMessage
 function sendMessage(recipientId, message) {
-  return rp.post({
-    url: "https://graph.facebook.com/v2.9/me/messages",
-    qs: { access_token: PAGE_ACCESS_TOKEN },
-    json: {
-      recipient: { id: recipientId },
-      message: message,
-    }
-  }).then(res => {
-    const recipientId = res.recipient_id;
-    const messageId = res.message_id;
-    if (messageId) {
-      console.log("Successfully sent message with id %s to recipient %s",
-        messageId, recipientId);
-    } else {
-      console.log("Successfully called Send API for recipient %s",
-        recipientId);
-    }
-    return res;
-  }).catch(body => console.error("Failed calling Send API", body.statusCode, body.message, body.error));
+  return rp
+    .post({
+      url: 'https://graph.facebook.com/v2.9/me/messages',
+      qs: {access_token: PAGE_ACCESS_TOKEN},
+      json: {
+        recipient: {id: recipientId},
+        message: message,
+      },
+    })
+    .then(res => {
+      const recipientId = res.recipient_id;
+      const messageId = res.message_id;
+      if (messageId) {
+        console.log(
+          'Successfully sent message with id %s to recipient %s',
+          messageId,
+          recipientId
+        );
+      } else {
+        console.log(
+          'Successfully called Send API for recipient %s',
+          recipientId
+        );
+      }
+      return res;
+    })
+    .catch(body =>
+      console.error(
+        'Failed calling Send API',
+        body.statusCode,
+        body.message,
+        body.error
+      )
+    );
 }
-
 
 function sendCheckoutMessage(recipientId) {
   const userOrder = shoppingCartSevice.forUser(recipientId);
@@ -599,8 +689,10 @@ function sendCheckoutMessage(recipientId) {
             type: 'template',
             payload: {
               template_type: 'receipt',
-              recipient_name: `${bill.order_user.first_name} ${bill.order_user.last_name}`,
-              order_number: "Order_" + bill.order_id,
+              recipient_name: `${bill.order_user.first_name} ${
+                bill.order_user.last_name
+              }`,
+              order_number: 'Order_' + bill.order_id,
               currency: bill.currency,
               payment_method: bill.payment_type,
               timestamp: bill.checkoutTime,
@@ -613,11 +705,11 @@ function sendCheckoutMessage(recipientId) {
                 image_url: order_detail.product.image_url,
               })),
               address: {
-                street_1: "702 Nguyen Van Linh",
-                city: "Ho Chi Minh",
-                postal_code: "700000",
-                state: "HCM",
-                country: "VN"
+                street_1: '702 Nguyen Van Linh',
+                city: 'Ho Chi Minh',
+                postal_code: '700000',
+                state: 'HCM',
+                country: 'VN',
               },
               summary: {
                 subtotal: bill.subtotal,
@@ -636,7 +728,7 @@ function sendCheckoutMessage(recipientId) {
           postal_code: bill.shipping_address.postal_code,
           state: bill.shipping_address.state,
           country: bill.shipping_address.country,
-        }
+        };
       }
       return messageData;
     })
@@ -661,18 +753,30 @@ function callSendAPI(messageData) {
       const recipientId = res.recipient_id;
       const messageId = res.message_id;
       if (messageId) {
-        console.log("Successfully sent message with id %s to recipient %s",
-          messageId, recipientId);
+        console.log(
+          'Successfully sent message with id %s to recipient %s',
+          messageId,
+          recipientId
+        );
       } else {
-        console.log("Successfully called Send API for recipient %s",
-          recipientId);
+        console.log(
+          'Successfully called Send API for recipient %s',
+          recipientId
+        );
       }
       return res;
     })
-    .catch(body => console.error("Failed calling Send API", body.statusCode, body.message, body.error));
+    .catch(body =>
+      console.error(
+        'Failed calling Send API',
+        body.statusCode,
+        body.message,
+        body.error
+      )
+    );
 }
 
-app.listen(app.get('port'), function () {
+app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
 
