@@ -1,11 +1,16 @@
-import {NestFactory} from '@nestjs/core';
-import {ApplicationModule} from './app.module';
-import { LoggerService } from "./utils/logger.service";
+import { NestFactory } from '@nestjs/core';
+import { environments } from './utils/config';
+import { ApplicationModule } from './app.module';
+import { LoggerService } from './shared/logger.service';
 
 async function bootstrap() {
+  const logger = LoggerService.create('Main');
   const app = await NestFactory.create(ApplicationModule, {
-    logger: LoggerService.create('Main'),
+    logger,
   });
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(environments.port, () => {
+    logger.log(`Webhook is listerning on port: ${environments.port}`);
+  });
 }
+
 bootstrap();

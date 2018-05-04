@@ -1,10 +1,11 @@
-import {URL, URLSearchParams} from 'url';
+import { URL, URLSearchParams } from 'url';
 import * as fetch from 'node-fetch';
-import {camelizeKeys, decamelizeKeys} from 'humps';
-import {Component} from '@nestjs/common';
+import { camelizeKeys, decamelizeKeys } from 'humps';
+import { Component as Injectable } from '@nestjs/common';
+import { environments } from '../utils';
 
 interface MessengerResponse {
-  recipient: {id: string};
+  recipient: { id: string };
 }
 
 interface QuickReplyResponse extends MessengerResponse {
@@ -25,19 +26,14 @@ interface SuccessResponse {
   messageId: string;
 }
 
-const FB_API_URL = 'https://graph.facebook.com/v2.12/me';
-const PAGE_ACCESS_TOKEN = '';
-
-@Component()
-export class FacebookSendApiUtils {
+@Injectable()
+export class FacebookSendApiProvider {
   async send(payload: MessengerResponse, queryString = {}, path = '/messages') {
     try {
-      const url = new URL(FB_API_URL + path);
+      const url = new URL(environments.messengerCallbackUrl + path);
       const params = new URLSearchParams();
-      params.append('access_token', PAGE_ACCESS_TOKEN);
-      Object.keys(queryString).forEach(key =>
-        params.append(key, queryString[key])
-      );
+      params.append('access_token', environments.accessToken);
+      Object.keys(queryString).forEach(key => params.append(key, queryString[key]));
       url.search = params.toString();
       const response = await fetch(url, {
         headers: {
@@ -45,7 +41,7 @@ export class FacebookSendApiUtils {
           'Content-Type': 'application/json',
         },
         method: 'POST',
-        body: JSON.stringify(decamelizeKeys(payload)),
+        body: JSON.stringify(payload),
       });
       const body = camelizeKeys(await response.json()) as SuccessResponse;
       return body;
@@ -54,12 +50,7 @@ export class FacebookSendApiUtils {
     }
   }
 
-  async quickReply(
-    psid: string,
-    text: string,
-    title: string,
-    postback_payload
-  ) {
+  async quickReply(psid: string, text: string, title: string, postback_payload) {
     const payload = {
       recipient: {
         id: psid,

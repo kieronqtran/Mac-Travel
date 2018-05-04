@@ -5,35 +5,48 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Start Debug for Application",
       "type": "node",
       "request": "launch",
-      "name": "Mocha Tests",
+      "envFile": "${workspaceFolder}/.env",
+      "args": ["-r", "ts-node/register", "src/main.ts"],
+      "cwd": "${workspaceRoot}",
       "protocol": "inspector",
-      "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
-      "args": [
-        "-u",
-        "bdd",
-        "--timeout",
-        "999999",
-        "--colors",
-        "--recursive",
-        "--reporter",
-        "spec",
-        "--require",
-        "${workspaceRoot}/tests/util/setup.js",
-        "${workspaceRoot}/tests/**/*.spec.js"
-      ],
-      "env": {
-        "NODE_ENV": "test"
-      },
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
       "type": "node",
       "request": "attach",
-      "name": "Attach by Process ID",
-      "protocol": "inspector",
-      "processId": "${command:PickProcess}"
+      "name": "Attach Debug to Node",
+      "processId": "${command:PickProcess}",
+      "restart": true,
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Test All",
+      "env": {
+        "DISABLE_DEBUG": "true",
+        "NODE_ENV": "test"
+      },
+      "envFile": "${workspaceFolder}/.env",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      "args": ["--runInBand"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Test Current File",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      "args": ["${relativeFile}"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
     }
   ]
 }

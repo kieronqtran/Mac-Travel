@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UserService getUserByFacebookId should fetch user if not exist 1`] = `
+Array [
+  Array [
+    "https://graph.facebook.com/v2.12/me/2042621042422137?access_token=this_is_a_fake_token&fields=%27first_name%2Clast_name%2Ctimezone%2Cgender%27",
+    Object {
+      "headers": Object {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+      "method": "GET",
+    },
+  ],
+]
+`;
