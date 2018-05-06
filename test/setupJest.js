@@ -1,5 +1,5 @@
-const fetch = require('jest-fetch-mock');
-jest.setMock('node-fetch', fetch);
+require('isomorphic-fetch');
+jest.setTimeout(120000);
 
 process.env.MESSENGER_PAGE_ACCESS_TOKEN = 'this_is_a_fake_token';
 process.env.MESSENGER_CALLBACK_URL = 'https://graph.facebook.com/v2.12/me';

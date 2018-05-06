@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { environments } from './utils/config';
 import { ApplicationModule } from './app.module';
 import { LoggerService } from './shared/logger.service';
+import 'isomorphic-fetch';
 
 async function bootstrap() {
   const logger = LoggerService.create('Main');

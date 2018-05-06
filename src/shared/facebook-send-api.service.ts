@@ -1,5 +1,4 @@
 import { URL, URLSearchParams } from 'url';
-import * as fetch from 'node-fetch';
 import { camelizeKeys, decamelizeKeys } from 'humps';
 import { Component as Injectable } from '@nestjs/common';
 import { environments } from '../utils';
@@ -30,12 +29,12 @@ interface SuccessResponse {
 export class FacebookSendApiProvider {
   async send(payload: MessengerResponse, queryString = {}, path = '/messages') {
     try {
-      const url = new URL(environments.messengerCallbackUrl + path);
+      const url = new URL(environments.messenger.callbackUrl + path);
       const params = new URLSearchParams();
-      params.append('access_token', environments.accessToken);
+      params.append('access_token', environments.messenger.accessToken);
       Object.keys(queryString).forEach(key => params.append(key, queryString[key]));
       url.search = params.toString();
-      const response = await fetch(url, {
+      const response = await fetch(url.toString(), {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
@@ -208,47 +207,4 @@ export class FacebookSendApiProvider {
 
     return this.send(messageData);
   }
-}
-
-export interface Sender {
-  id: string;
-}
-
-export interface Recipient {
-  id: string;
-}
-
-export interface Payload {
-  url: string;
-  sticker_id: number;
-}
-
-export interface Attachment {
-  type: string;
-  payload: Payload;
-}
-
-export interface Message {
-  mid: string;
-  seq: number;
-  sticker_id: number;
-  attachments: Attachment[];
-}
-
-export interface Messaging {
-  sender: Sender;
-  recipient: Recipient;
-  timestamp: number;
-  message: Message;
-}
-
-export interface Entry {
-  id: string;
-  time: number;
-  messaging: Messaging[];
-}
-
-export interface RootObject {
-  object: string;
-  entry: Entry[];
 }

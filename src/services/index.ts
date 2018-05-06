@@ -1,6 +1,8 @@
 import { UserService } from './user.service';
-import { shoppingCartProvider, ShopingCartService } from './shopping-cart.service';
+import { ShopingCartService } from './shopping-cart.service';
+import { OrderService } from './order.service';
+import { ProductService } from './product.service';
 
-export const services = [shoppingCartProvider, UserService];
+export const services = [ShopingCartService, UserService, OrderService, ProductService];
 
-export { shoppingCartProvider, ShopingCartService, UserService };
+export { ShopingCartService, UserService, OrderService, ProductService };

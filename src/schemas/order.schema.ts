@@ -1,11 +1,11 @@
-import { Schema, Document } from 'mongoose';
-import { UserSchema } from './index';
-import { User } from '../interfaces';
+import { Schema, Document, SchemaTypeOpts } from 'mongoose';
+import { UserSchema, ProductSchema } from './index';
+import { User, Product } from '../interfaces';
 
 export const OrderDetailSchema = new Schema({
   quantity: Number,
   total_price: Number,
-  product: UserSchema,
+  product: { type: Schema.Types.ObjectId, ref: 'products' },
 });
 
 export const ShippingAddressSchema = new Schema({
@@ -17,18 +17,21 @@ export const ShippingAddressSchema = new Schema({
   country: String,
 });
 
-export const OrderSchema = new Schema({
-  payment_type: String,
-  currency: String,
-  subtotal: Number,
-  shipping_cost: Number,
-  total_cost: Number,
-  total_tax: Number,
-  checkouted: Boolean,
-  checkoutTime: String,
-  updatedTime: Number,
-  createdTime: Number,
-  order_user: UserSchema,
-  order_details: [OrderDetailSchema],
-  shipping_address: ShippingAddressSchema,
-});
+export const OrderSchema = new Schema(
+  {
+    payment_type: String,
+    currency: String,
+    subtotal: Number,
+    shipping_cost: Number,
+    total_cost: Number,
+    total_tax: Number,
+    checkouted: { type: Boolean, default: false },
+    checkout_time: { type: Schema.Types.Date, max: Date.now },
+    order_user: { type: Schema.Types.ObjectId, ref: 'users' },
+    order_details: [OrderDetailSchema],
+    shipping_address: ShippingAddressSchema,
+  },
+  {
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+  },
+);

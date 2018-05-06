@@ -27,14 +27,14 @@ export class LoggerService implements NestLoggerService {
     ],
   };
 
-  static create(context: string, customsTransports?: TransportInstance[]) {
-    return new this(context, customsTransports);
-  }
-
-  private constructor(private context: string, customsTransports?: TransportInstance[]) {
-    this.logger = new Logger(LoggerService.loggerOptions);
+  private constructor(private context: string, loggerOptions: LoggerOptions) {
+    this.logger = new Logger(loggerOptions);
     this.prettyError.skipNodeFiles();
     this.prettyError.skipPackage('express', '@nestjs/common', '@nestjs/core');
+  }
+
+  static create(context: string, opt?: LoggerOptions): LoggerService {
+    return new this(context, opt || LoggerService.loggerOptions);
   }
 
   static configGlobal(options?: LoggerOptions) {
@@ -50,8 +50,8 @@ export class LoggerService implements NestLoggerService {
   }
 
   debug(message: string): void {
-    if (process.env.NODE_ENV !== 'production' && process.env.DISABLE_DEBUG !== 'true') {
-      this.formatedLog('debug', message);
+    if (process.env.NODE_ENV !== 'production' && process.env.ENABLE_DEBUG === 'true') {
+      this.formatedLog(LogLevel.DEBUG, message);
     }
   }
 
@@ -61,7 +61,7 @@ export class LoggerService implements NestLoggerService {
       timestamp: currentDate.toISOString(),
       context: this.context,
     });
-    this.formatedLog('info', message);
+    this.formatedLog(LogLevel.INFO, message);
   }
 
   error(message: string, trace?: any): void {
@@ -71,7 +71,7 @@ export class LoggerService implements NestLoggerService {
       timestamp: currentDate.toISOString(),
       context: this.context,
     });
-    this.formatedLog('error', message, trace);
+    this.formatedLog(LogLevel.ERROR, message, trace);
   }
 
   warn(message: string): void {
@@ -80,28 +80,28 @@ export class LoggerService implements NestLoggerService {
       timestamp: currentDate.toISOString(),
       context: this.context,
     });
-    this.formatedLog('warn', message);
+    this.formatedLog(LogLevel.WARN, message);
   }
 
   // this method just for printing a cool log in your terminal , using chalk
-  private formatedLog(level: string, message: string, error?): void {
+  private formatedLog(level: LogLevel, message: string, error?): void {
     let result = '';
     const color = chalk.default;
     const currentDate = new Date();
     const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
 
     switch (level) {
-      case 'debug':
+      case LogLevel.DEBUG:
         result = `[${color.blue('DEBUG')}] ${color.dim.yellow.bold.underline(time)} [${color.green(this.context)}] ${message}`;
         break;
-      case 'info':
+      case LogLevel.INFO:
         result = `[${color.blue('INFO')}] ${color.dim.yellow.bold.underline(time)} [${color.green(this.context)}] ${message}`;
         break;
-      case 'error':
+      case LogLevel.ERROR:
         result = `[${color.red('ERR')}] ${color.dim.yellow.bold.underline(time)} [${color.green(this.context)}] ${message}`;
         if (error && process.env.NODE_ENV === 'dev') this.prettyError.render(error, true);
         break;
-      case 'warn':
+      case LogLevel.WARN:
         result = `[${color.yellow('WARN')}] ${color.dim.yellow.bold.underline(time)} [${color.green(this.context)}] ${message}`;
         break;
       default:

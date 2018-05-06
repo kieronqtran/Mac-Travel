@@ -4,7 +4,7 @@ import { URL, URLSearchParams } from 'url';
 import { environments } from '../utils';
 import { LoggerService } from '../shared';
 import { User } from '../interfaces';
-const fetch = require('node-fetch');
+// const fetch = require('node-fetch'); // bug in jest, can't mock node-fetch module if using import
 
 @Injectable()
 export class UserService {
@@ -19,12 +19,12 @@ export class UserService {
         this.logger.debug(`senderId ${facebookId} found return ${JSON.stringify(foundUser.toJSON())}`);
         return foundUser;
       }
-      const url = new URL(`${environments.messengerCallbackUrl}/${facebookId}`);
+      const url = new URL(`${environments.messenger.callbackUrl}/${facebookId}`);
       const params = new URLSearchParams();
-      params.append('access_token', environments.accessToken);
+      params.append('access_token', environments.messenger.accessToken);
       params.append('fields', "'first_name,last_name,timezone,gender'");
       url.search = params.toString();
-      const response = await fetch(url, {
+      const response = await fetch(url.toString(), {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
